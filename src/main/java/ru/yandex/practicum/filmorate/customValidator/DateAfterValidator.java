@@ -5,11 +5,17 @@ import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 
 public class DateAfterValidator implements ConstraintValidator<DateAfter, LocalDate> {
+    private String annotationDateAfter;
 
     @Override
-    public boolean isValid(LocalDate date, ConstraintValidatorContext context) {
-        if (date != null) {
-            return date.isAfter(LocalDate.of(1895, 12, 28));
+    public void initialize(DateAfter date) {
+        this.annotationDateAfter = date.value();
+    }
+
+    @Override
+    public boolean isValid(LocalDate target, ConstraintValidatorContext context) {
+        if (target != null) {
+            return target.isAfter(LocalDate.parse(annotationDateAfter));
         }
         return false;
     }

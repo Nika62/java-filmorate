@@ -116,8 +116,12 @@ class FilmControllerTest {
         );
         mockMvc.perform(
                         get("/films")
-                ).andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                ).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[*].name").exists())
+                .andExpect(jsonPath("$[*].description").exists())
+                .andExpect(jsonPath("$[*].releaseDate").exists())
+                .andExpect(jsonPath("$[*].duration").exists());
     }
 
 }

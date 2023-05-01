@@ -16,6 +16,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface DateAfter {
     String message() default "{DateAfter.invalid}";
 
+    String value() default "1895-12-28";
+
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};

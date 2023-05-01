@@ -113,7 +113,12 @@ class UserControllerTest {
         mockMvc.perform(
                         get("/users")
                 ).andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[*].login").exists())
+                .andExpect(jsonPath("$[*].name").exists())
+                .andExpect(jsonPath("$[*].email").exists())
+                .andExpect(jsonPath("$[*].birthday").exists());
+
     }
 
 }
