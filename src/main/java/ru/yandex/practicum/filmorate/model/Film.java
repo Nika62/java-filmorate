@@ -10,13 +10,16 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Film {
     @EqualsAndHashCode.Exclude
-    private int id;
+    private long id;
+    private final Set<Long> likes = new HashSet<>();
     @NotBlank(message = "Имя не может быть пустым")
     private String name;
     @Size(max = 200, message = "Длина поля description не должна превышать 200 символов")
@@ -31,5 +34,17 @@ public class Film {
         this.description = description;
         this.releaseDate = date;
         this.duration = duration;
+    }
+
+    public boolean addLike(long id) {
+        return likes.add(id);
+    }
+
+    public boolean deleteLike(long id) {
+        return likes.remove(id);
+    }
+
+    public int getNumberOfLikes() {
+        return likes.size();
     }
 }

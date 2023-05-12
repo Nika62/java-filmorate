@@ -10,13 +10,17 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
     @EqualsAndHashCode.Exclude
-    private int id;
+    private long id;
+
+    private Set<Long> userFriends = new HashSet<>();
     @Email(message = "Некорректный формат адреса электронной почты")
     @NotBlank(message = "Электронная почта не может быть пустой")
     private String email;
@@ -33,5 +37,13 @@ public class User {
         this.login = login;
         this.name = name;
         this.birthday = birthday;
+    }
+
+    public boolean addFriend(Long id) {
+        return userFriends.add(id);
+    }
+
+    public boolean deleteFriend(Long id) {
+        return userFriends.remove(id);
     }
 }
