@@ -16,10 +16,11 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Film {
+public class Film implements Comparable<Film> {
     @EqualsAndHashCode.Exclude
     private long id;
-    private final Set<Long> likes = new HashSet<>();
+    @EqualsAndHashCode.Exclude
+    private Set<Long> likes = new HashSet<>();
     @NotBlank(message = "Имя не может быть пустым")
     private String name;
     @Size(max = 200, message = "Длина поля description не должна превышать 200 символов")
@@ -36,6 +37,23 @@ public class Film {
         this.duration = duration;
     }
 
+    public Film(String name, HashSet<Long> list, String description, LocalDate date, int duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = date;
+        this.duration = duration;
+        this.likes = list;
+    }
+
+    public Film(int id, String name, String description, LocalDate date, int duration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = date;
+        this.duration = duration;
+    }
+
+
     public boolean addLike(long id) {
         return likes.add(id);
     }
@@ -46,5 +64,13 @@ public class Film {
 
     public int getNumberOfLikes() {
         return likes.size();
+    }
+
+    @Override
+    public int compareTo(Film f) {
+        if (f.getNumberOfLikes() <= 0) {
+            return -1;
+        }
+        return (f.getNumberOfLikes()) - getNumberOfLikes();
     }
 }

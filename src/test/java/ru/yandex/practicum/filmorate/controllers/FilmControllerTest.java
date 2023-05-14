@@ -16,6 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -124,4 +126,88 @@ class FilmControllerTest {
                 .andExpect(jsonPath("$[*].duration").exists());
     }
 
+    @Test
+    @SneakyThrows
+    void shouldGetPopularFilms() {
+        HashSet<Long> set1 = new HashSet<>(Arrays.asList(1l, 2l, 3l));
+        HashSet<Long> set2 = new HashSet<>(Arrays.asList(1l, 2l, 3l, 4l));
+        HashSet<Long> set3 = new HashSet<>(Arrays.asList(1l, 2l, 3l, 4l, 5l));
+        HashSet<Long> set4 = new HashSet<>(Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l));
+        HashSet<Long> set5 = new HashSet<>(Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l));
+        HashSet<Long> set6 = new HashSet<>(Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l));
+        HashSet<Long> set7 = new HashSet<>(Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l));
+        HashSet<Long> set8 = new HashSet<>(Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l));
+        HashSet<Long> set9 = new HashSet<>(Arrays.asList(1l, 2l));
+        HashSet<Long> set10 = new HashSet<>(Arrays.asList(1l));
+
+        Film filmBeforeUpdate1 = new Film("Крадущийся тигр затаившийся лосось1", set1, "в кустах черники", LocalDate.of(1992, 12, 30), 90);
+        Film filmBeforeUpdate2 = new Film("Крадущийся тигр затаившийся лосось2", set2, "в кустах черники", LocalDate.of(1992, 12, 30), 90);
+        Film filmBeforeUpdate3 = new Film("Крадущийся тигр затаившийся лосось3", set3, "в кустах черники", LocalDate.of(1992, 12, 30), 90);
+        Film filmBeforeUpdate4 = new Film("Крадущийся тигр затаившийся лосось4", set4, "в кустах черники", LocalDate.of(1992, 12, 30), 90);
+        Film filmBeforeUpdate5 = new Film("Крадущийся тигр затаившийся лосось5", set5, "в кустах черники", LocalDate.of(1992, 12, 30), 90);
+        Film filmBeforeUpdate6 = new Film("Крадущийся тигр затаившийся лосось6", set6, "в кустах черники", LocalDate.of(1992, 12, 30), 90);
+        Film filmBeforeUpdate7 = new Film("Крадущийся тигр затаившийся лосось7", set7, "в кустах черники", LocalDate.of(1992, 12, 30), 90);
+        Film filmBeforeUpdate8 = new Film("Крадущийся тигр затаившийся лосось8", set8, "в кустах черники", LocalDate.of(1992, 12, 30), 90);
+        Film filmBeforeUpdate9 = new Film("Крадущийся тигр затаившийся лосось9", set9, "в кустах черники", LocalDate.of(1992, 12, 30), 90);
+        Film filmBeforeUpdate10 = new Film("Крадущийся тигр затаившийся лосось10", set10, "в кустах черники", LocalDate.of(1992, 12, 30), 90);
+        mockMvc.perform(
+                post("/films")
+                        .content(objectMapper.writeValueAsString(filmBeforeUpdate1))
+                        .contentType(MediaType.APPLICATION_JSON)
+
+        );
+        mockMvc.perform(
+                post("/films")
+                        .content(objectMapper.writeValueAsString(filmBeforeUpdate2))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+        mockMvc.perform(
+                post("/films")
+                        .content(objectMapper.writeValueAsString(filmBeforeUpdate3))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+        mockMvc.perform(
+                post("/films")
+                        .content(objectMapper.writeValueAsString(filmBeforeUpdate4))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+        mockMvc.perform(
+                post("/films")
+                        .content(objectMapper.writeValueAsString(filmBeforeUpdate5))
+                        .contentType(MediaType.APPLICATION_JSON)
+
+        );
+        mockMvc.perform(
+                post("/films")
+                        .content(objectMapper.writeValueAsString(filmBeforeUpdate6))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+        mockMvc.perform(
+                post("/films")
+                        .content(objectMapper.writeValueAsString(filmBeforeUpdate7))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+        mockMvc.perform(
+                post("/films")
+                        .content(objectMapper.writeValueAsString(filmBeforeUpdate8))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+        mockMvc.perform(
+                post("/films")
+                        .content(objectMapper.writeValueAsString(filmBeforeUpdate9))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+        mockMvc.perform(
+                post("/films")
+                        .content(objectMapper.writeValueAsString(filmBeforeUpdate10))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        mockMvc.perform(
+                        get("/films/popular")
+                ).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].name").value("Крадущийся тигр затаившийся лосось8"));
+
+    }
 }

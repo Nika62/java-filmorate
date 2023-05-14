@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFondException;
 import ru.yandex.practicum.filmorate.exception.IncorrectPathVariableException;
@@ -11,7 +10,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class FilmService {
-    @Autowired
+
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
@@ -36,13 +36,14 @@ public class FilmService {
         return filmStorage.getFilmById(filmId).deleteLike(userId);
     }
 
-    public List<Film> getListBestByLikeFilms(int count) {
+    public List<Film> getPopularFilms(int count) {
         if (count <= 0) {
             throw new IncorrectPathVariableException("count");
         }
-        return filmStorage.getAllFilms().stream()
+        ArrayList<Film> films = (ArrayList<Film>) filmStorage.getAllFilms();
+        Collections.sort(films, Film::compareTo);
+        return films.stream()
                 .limit(count)
-                .sorted(Comparator.comparingInt(Film::getNumberOfLikes))
                 .collect(Collectors.toList());
     }
 

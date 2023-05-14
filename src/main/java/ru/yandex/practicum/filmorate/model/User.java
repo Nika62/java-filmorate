@@ -19,7 +19,7 @@ import java.util.Set;
 public class User {
     @EqualsAndHashCode.Exclude
     private long id;
-
+    @EqualsAndHashCode.Exclude
     private Set<Long> userFriends = new HashSet<>();
     @Email(message = "Некорректный формат адреса электронной почты")
     @NotBlank(message = "Электронная почта не может быть пустой")
@@ -33,6 +33,14 @@ public class User {
     private LocalDate birthday;
 
     public User(String email, String login, String name, LocalDate birthday) {
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+    }
+
+    public User(long id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
         this.email = email;
         this.login = login;
         this.name = name;

@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -38,7 +37,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        System.out.println(films);
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             log.info("Фильм: " + film + " обновлен");
@@ -76,9 +74,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (films.isEmpty()) {
             return new ArrayList<>();
         } else {
-            return (ArrayList<Film>) films.entrySet()
+            return (ArrayList<Film>) films.values()
                     .stream()
-                    .map(Map.Entry::getValue)
                     .collect(Collectors.toList());
         }
     }

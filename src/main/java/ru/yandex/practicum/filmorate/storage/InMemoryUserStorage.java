@@ -9,9 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -83,10 +81,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (users.isEmpty()) {
             return new ArrayList<>();
         } else {
-            return (ArrayList<User>) users.entrySet()
-                    .stream()
-                    .map(Map.Entry::getValue)
-                    .collect(Collectors.toList());
+            return new ArrayList<>(users.values());
         }
     }
 }

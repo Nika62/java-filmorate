@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.IncorrectPathVariableException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
@@ -24,6 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FilmController {
     private final FilmStorage filmStorage;
+    private final FilmService filmService;
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
@@ -51,5 +54,36 @@ public class FilmController {
             throw new IncorrectPathVariableException("id");
         }
         return filmStorage.getFilmById(id.get());
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public boolean addLikeFilm(@PathVariable Optional<Long> id, @PathVariable Optional<Long> userId) {
+        checkById(id, userId);
+        return filmService.addLikeFilm(id.get(), userId.get());
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public boolean deleteLikeFilm(@PathVariable Optional<Long> id, @PathVariable Optional<Long> userId) {
+        checkById(id, userId);
+        return filmService.deleteLikeFilm(id.get(), userId.get());
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopularFilms(@RequestParam(required = false) Optional<Integer> count) {
+        int quantity = 0;
+        if (!count.isPresent()) {
+            quantity = 10;
+        } else {
+            quantity = count.get();
+        }
+        return filmService.getPopularFilms(quantity);
+    }
+
+    private void checkById(Optional<Long> id, Optional<Long> userId) {
+        if (!id.isPresent()) {
+            throw new IncorrectPathVariableException("id");
+        } else if (!userId.isPresent()) {
+            throw new IncorrectPathVariableException("userId");
+        }
     }
 }
