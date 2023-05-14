@@ -23,6 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserController {
     private final UserStorage userStorage;
+
     @PostMapping
     public User addUser(@Valid @RequestBody User user) {
         return userStorage.addUser(user);
