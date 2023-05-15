@@ -48,8 +48,8 @@ public class UserService {
 
     private void checkUserById(long userId) {
         if (Objects.isNull(userStorage.getUserById(userId))) {
-            log.info("Пользователь с id: " + userId + " не зарегистрирован в базе.");
-            throw new UserNotFoundException("Пользователь с id: " + userId + " не зарегистрирован в базе.");
+            log.info("Пользователь с id {} не зарегистрирован в базе.", userId);
+            throw new UserNotFoundException(String.format("Пользователь с id %d не зарегистрирован в базе.", userId));
         }
     }
 

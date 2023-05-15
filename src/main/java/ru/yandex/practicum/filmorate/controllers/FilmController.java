@@ -69,14 +69,8 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(required = false) Optional<Integer> count) {
-        int quantity = 0;
-        if (!count.isPresent()) {
-            quantity = 10;
-        } else {
-            quantity = count.get();
-        }
-        return filmService.getPopularFilms(quantity);
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        return filmService.getPopularFilms(count);
     }
 
     private void checkById(Optional<Long> id, Optional<Long> userId) {

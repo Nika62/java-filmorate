@@ -25,7 +25,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User addUser(User user) {
         if (users.containsValue(user)) {
-            log.info("Произошла ошибка при добавлении пользователя. " + user + " уже существует.");
+            log.info("Произошла ошибка при добавлении пользователя. {} уже существует.", user);
             throw new DataAlreadyExistsException("Пользователь " + user + " уже существует.");
         }
         if (Objects.isNull(user.getName()) || user.getName().isBlank()) {
@@ -48,7 +48,7 @@ public class InMemoryUserStorage implements UserStorage {
             log.info("Пользователь: " + user + " обновлен");
             return users.get(user.getId());
         } else {
-            log.info("Произошла ошибка при обновлении пользователя. " + user + " отсутствует в базе.");
+            log.info("Произошла ошибка при обновлении пользователя. {} отсутствует в базе.", user);
             throw new UserNotFoundException("Пользователь " + user + " не зарегистрирован в базе.");
         }
     }
@@ -56,7 +56,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public boolean deleteUser(User user) {
         if (!users.containsValue(user)) {
-            log.info("Произошла ошибка при удалении пользователя. " + user + " отсутствует в базе.");
+            log.info("Произошла ошибка при удалении пользователя.{} отсутствует в базе.", user);
             throw new UserNotFoundException("Пользователь " + user + " не зарегистрирован в базе.");
         }
         users.remove(user.getId());
@@ -71,8 +71,8 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User getUserById(Long id) {
         if (!users.containsKey(id)) {
-            log.info("Произошла ошибка при поиске пользователя по id. Id " + id + " отсутствует в базе.");
-            throw new UserNotFoundException("Пользователь с id " + id + " не зарегистрирован в базе.");
+            log.info("Произошла ошибка при поиске пользователя по id. {} отсутствует в базе.", id);
+            throw new UserNotFoundException(String.format("Пользователь с id %d не зарегистрирован в базе.", id));
         }
         return users.get(id);
     }

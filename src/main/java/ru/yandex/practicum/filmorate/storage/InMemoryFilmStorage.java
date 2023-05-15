@@ -3,13 +3,12 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DataAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exception.FilmNotFondException;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -25,14 +24,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film addFilm(Film film) {
         if (films.containsValue(film)) {
-            log.info("Произошла ошибка при добавлении фильма. " + film + " уже существует.");
+            log.info("Произошла ошибка при добавлении фильма. {} уже существует.", film);
             throw new DataAlreadyExistsException("Фильм " + film + " уже существует.");
 
         }
         films.put(assignId(film), film);
-        log.info("Добавлен новый фильм: " + film);
-        return films.get(film.getId());
-
+        log.info("Добавлен новый фильм {}.", film);
+        return film;
     }
 
     @Override
@@ -42,16 +40,16 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.info("Фильм: " + film + " обновлен");
             return films.get(film.getId());
         } else {
-            log.info("Произошла ошибка при обновлении фильма. " + film + " отсутствует в фильмотеке.");
-            throw new FilmNotFondException("Фильм " + film + " отсутствует в фильмотеке.");
+            log.info("Произошла ошибка при обновлении фильма. {} отсутствует в фильмотеке.", film);
+            throw new FilmNotFoundException("Фильм " + film + " отсутствует в фильмотеке.");
         }
     }
 
     @Override
     public boolean deleteFilm(Film film) {
         if (!films.containsValue(film)) {
-            log.info("Произошла ошибка при удалении фильма. " + film + " отсутствует в фильмотеке.");
-            throw new FilmNotFondException("Фильм " + film + " отсутствует в фильмотеке.");
+            log.info("Произошла ошибка при удалении фильма.{} отсутствует в фильмотеке.", film);
+            throw new FilmNotFoundException("Фильм" + film + " отсутствует в фильмотеке.");
         }
         films.remove(film.getId());
         return true;
@@ -59,24 +57,18 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
-        return getFilms();
+        if (films.isEmpty()) {
+            return new ArrayList<>();
+        } else {
+            return new ArrayList<Film>(films.values());
+        }
     }
 
     @Override
     public Film getFilmById(long id) {
         if (!films.containsKey(id)) {
-            throw new FilmNotFondException("Фильм с id " + id + " отсутствует в фильмотеке.");
+            throw new FilmNotFoundException(String.format("Фильм с id %d отсутствует в фильмотеке.", id));
         }
         return films.get(id);
-    }
-
-    private ArrayList<Film> getFilms() {
-        if (films.isEmpty()) {
-            return new ArrayList<>();
-        } else {
-            return (ArrayList<Film>) films.values()
-                    .stream()
-                    .collect(Collectors.toList());
-        }
     }
 }

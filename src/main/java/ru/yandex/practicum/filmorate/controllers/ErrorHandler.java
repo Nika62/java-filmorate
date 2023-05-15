@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exception.DataAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exception.FilmNotFondException;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IncorrectPathVariableException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 
@@ -19,9 +19,9 @@ public class ErrorHandler {
         return new ErrorResponse("Запрос некорректен, проверьте переменную запроса: " + e.getVariable());
     }
 
-    @ExceptionHandler({UserNotFoundException.class, FilmNotFondException.class})
+    @ExceptionHandler({UserNotFoundException.class, FilmNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    ErrorResponse handleUserOrFilmNotFondException(final RuntimeException e) {
+    ErrorResponse handleUserOrFilmNotFoundException(final RuntimeException e) {
         return new ErrorResponse(e.getMessage());
     }
 

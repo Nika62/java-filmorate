@@ -3,15 +3,14 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.FilmNotFondException;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IncorrectPathVariableException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -25,14 +24,18 @@ public class FilmService {
     private final UserStorage userStorage;
 
     public boolean addLikeFilm(long filmId, long userId) {
-        checkFilmById(filmId);
-        checkUserById(userId);
+        User user = userStorage.getUserById(userId);
+        Film film = filmStorage.getFilmById(filmId);
+        checkFilm(film, filmId);
+        checkUser(user, userId);
         return filmStorage.getFilmById(filmId).addLike(userId);
     }
 
     public boolean deleteLikeFilm(long filmId, long userId) {
-        checkUserById(userId);
-        checkFilmById(filmId);
+        User user = userStorage.getUserById(userId);
+        Film film = filmStorage.getFilmById(filmId);
+        checkFilm(film, filmId);
+        checkUser(user, userId);
         return filmStorage.getFilmById(filmId).deleteLike(userId);
     }
 
@@ -40,24 +43,25 @@ public class FilmService {
         if (count <= 0) {
             throw new IncorrectPathVariableException("count");
         }
-        ArrayList<Film> films = (ArrayList<Film>) filmStorage.getAllFilms();
-        Collections.sort(films, Film::compareTo);
+        List<Film> films = filmStorage.getAllFilms();
+        films.sort(Film::compareTo);
+
         return films.stream()
                 .limit(count)
                 .collect(Collectors.toList());
     }
 
-    private void checkUserById(long userId) {
-        if (Objects.isNull(userStorage.getUserById(userId))) {
-            log.info("Пользователь с id: " + userId + " не зарегистрирован в базе.");
-            throw new UserNotFoundException("Пользователь с id: " + userId + " не зарегистрирован в базе.");
+    private void checkUser(User user, long userId) {
+        if (Objects.isNull(user)) {
+            log.info("Пользователь с id {} не зарегистрирован в базе.", userId);
+            throw new UserNotFoundException(String.format("Пользователь с id %d не зарегистрирован в базе.", userId));
         }
     }
 
-    private void checkFilmById(long filmId) {
-        if (Objects.isNull(filmStorage.getFilmById(filmId))) {
-            log.info("Фильм с id: " + filmId + " не зарегистрирован в базе.");
-            throw new FilmNotFondException("Фильм с id: " + filmId + " не зарегистрирован в базе.");
+    private void checkFilm(Film film, long filmId) {
+        if (Objects.isNull(film)) {
+            log.info("Фильм с id {} не зарегистрирован в базе.", filmId);
+            throw new FilmNotFoundException(String.format("Фильм с id %d не зарегистрирован в базе.", filmId));
         }
     }
 }
