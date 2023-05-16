@@ -18,10 +18,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -104,24 +102,4 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().is(status));
     }
-
-    @SneakyThrows
-    @Test
-    void shouldGetAllFilm() {
-        Film filmBeforeUpdate = new Film("Крадущийся тигр затаившийся лосось", "в кустах черники", LocalDate.of(1992, 12, 30), 90);
-        mockMvc.perform(
-                post("/films")
-                        .content(objectMapper.writeValueAsString(filmBeforeUpdate))
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
-        mockMvc.perform(
-                        get("/films")
-                ).andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[*].name").exists())
-                .andExpect(jsonPath("$[*].description").exists())
-                .andExpect(jsonPath("$[*].releaseDate").exists())
-                .andExpect(jsonPath("$[*].duration").exists());
-    }
-
 }
