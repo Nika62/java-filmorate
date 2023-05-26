@@ -2,7 +2,7 @@
 
 ## Схема базы данных
 
-![ER диаграмма](file:///C:/Users/nika/Downloads/Filmorate%20(2).png)
+![ER диаграмма](/Filmorate.png)
 
 ### Описание базы данных
 
