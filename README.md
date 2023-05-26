@@ -2,7 +2,7 @@
 
 ## Схема базы данных
 
-![/images/filmorate3.jpg](ER диаграмма)
+![ER диаграмма](/images/filmorate3.jpg)
 
 ### Описание базы данных
 
