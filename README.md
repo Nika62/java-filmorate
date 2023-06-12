@@ -2,7 +2,7 @@
 
 ## Схема базы данных
 
-![ER диаграмма](/images/filmorate.jpg)
+![ER диаграмма](/images/FilmorateFinal.jpg)
 
 ### Описание базы данных
 
@@ -10,37 +10,41 @@
 Table films {
 id bigint [primary key]
 title varchar(127) [not null]
-description varchar(255)
-release_date timestamp
+description varchar(200)
+release_date date
 duration integer
 rating_MPA enum
 }
+
 Table users {
-id bigint [primary key]
-email varchar(254) [not null]
-login varchar(31) [not null]
-name  varchar(31)
-birthday date
+  id bigint [primary key]
+  email varchar(255) [not null]
+  login varchar(31) [not null]
+  name  varchar(31)
+  birthday date
 }
+
 Table genres {
-id integer [primary key]
-title varchar(31) [not null]
+  id integer [primary key]
+  title enum [not null]
 }
 Table users_like_films{
 user_id bigint  [primary key]
 film_id bigint  [primary key]
 }
 Table films_genres{
-film_id bigint  [primary key]
-genre_id integer  [primary key]
+  film_id bigint  [primary key]
+  genre_id integer  [primary key]
 }
 Table friendship{
-user_who_send_id bigint  [primary key]
-user_must_confirm_id bigint  [primary key]
-status_friendship enum
+  user_who_send_id bigint  [primary key]
+  user_must_confirm_id bigint  [primary key]
+  status_friendship enum
 }
 Ref: users_like_films.user_id > users.id
+
 Ref: users_like_films.film_id > films.id
+
 Ref: films_genres.film_id > films.id
 Ref: films_genres.genre_id > genres.id
 Ref: friendship.user_who_send_id > users.id

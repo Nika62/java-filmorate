@@ -2,55 +2,55 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
+    @Qualifier("userDb")
     private final UserStorage userStorage;
 
+    public User addUser(User user) {
+        return userStorage.addUser(user);
+    }
+
+    public User updateUser(User user) {
+        return userStorage.updateUser(user);
+    }
+
+    public boolean delete(User user) {
+        return userStorage.deleteUser(user);
+    }
+
+    public List<User> getAllUsers() {
+        return userStorage.getAllUsers();
+    }
+
+    public User getUserById(long id) {
+        return userStorage.getUserById(id);
+    }
+
     public boolean addFriend(long userId, long friendId) {
-        checkUserById(userId);
-        checkUserById(friendId);
-        return userStorage.getUserById(userId).addFriend(friendId) && userStorage.getUserById(friendId).addFriend(userId);
+        return userStorage.addFriend(userId, friendId);
     }
 
     public boolean deleteFriend(long userId, long friendId) {
-        checkUserById(userId);
-        checkUserById(friendId);
-
-        return userStorage.getUserById(userId).deleteFriend(friendId) && userStorage.getUserById(friendId).deleteFriend(userId);
+        return userStorage.deleteFriend(userId, friendId);
     }
 
     public List<User> getListMutualFriends(long userId, long friendId) {
-        checkUserById(userId);
-        checkUserById(friendId);
-        return userStorage.getAllUsers().stream()
-                .filter(u -> userStorage.getUserById(userId).getUserFriends().contains(u.getId())
-                        && userStorage.getUserById(friendId).getUserFriends().contains(u.getId()))
-                .collect(Collectors.toList());
+        return userStorage.getListMutualFriends(userId, friendId);
     }
 
     public List<User> getListFriendsUser(long userId) {
-        checkUserById(userId);
-        return userStorage.getAllUsers().stream()
-                .filter(u -> userStorage.getUserById(userId).getUserFriends().contains(u.getId()))
-                .collect(Collectors.toList());
+        return userStorage.getListFriendsUser(userId);
     }
 
-    private void checkUserById(long userId) {
-        if (Objects.isNull(userStorage.getUserById(userId))) {
-            log.info("Пользователь с id {} не зарегистрирован в базе.", userId);
-            throw new UserNotFoundException(String.format("Пользователь с id %d не зарегистрирован в базе.", userId));
-        }
-    }
 
 }

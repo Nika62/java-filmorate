@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.IncorrectPathVariableException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -25,27 +24,26 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class FilmController {
-    private final FilmStorage filmStorage;
     private final FilmService filmService;
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        return filmStorage.addFilm(film);
+        return filmService.addFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        return filmStorage.updateFilm(film);
+        return filmService.updateFilm(film);
     }
 
     @DeleteMapping
     public boolean deleteFilm(@RequestBody Film film) {
-        return filmStorage.deleteFilm(film);
+        return filmService.deleteFilm(film);
     }
 
     @GetMapping(produces = "application/json")
     public List<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        return filmService.getAllFilms();
     }
 
     @GetMapping("/{id}")
@@ -53,7 +51,7 @@ public class FilmController {
         if (!id.isPresent()) {
             throw new IncorrectPathVariableException("id");
         }
-        return filmStorage.getFilmById(id.get());
+        return filmService.getFilmById(id.get());
     }
 
     @PutMapping("/{id}/like/{userId}")
