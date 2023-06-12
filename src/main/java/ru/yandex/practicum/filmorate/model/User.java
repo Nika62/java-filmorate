@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -11,9 +8,11 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -28,7 +27,6 @@ public class User {
     @Pattern(regexp = "^\\S*$", message = "Логин не должен содержать пробелы")
     private String login;
     private String name;
-
     @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
 
@@ -53,5 +51,29 @@ public class User {
 
     public boolean deleteFriend(Long id) {
         return userFriends.remove(id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return email.equals(user.email) && login.equals(user.login) && name.equals(user.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(email, login, name);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", login='" + login + '\'' +
+                ", name='" + name + '\'' +
+                ", birthday=" + birthday +
+                '}';
     }
 }
