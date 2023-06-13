@@ -36,7 +36,7 @@ public class Film implements Comparable<Film> {
     @EqualsAndHashCode.Exclude
     private List<Integer> genres = new ArrayList<>();
 
-    public Film(String name, String description, LocalDate date, int duration, HashMap mpa) {
+    public Film(String name, String description, LocalDate date, int duration, HashMap<String, Object> mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = date;
@@ -52,7 +52,7 @@ public class Film implements Comparable<Film> {
         this.mpa = mpa;
     }
 
-    public Film(String name, HashSet<Long> list, String description, LocalDate date, int duration, HashMap mpa) {
+    public Film(String name, HashSet<Long> list, String description, LocalDate date, int duration, HashMap<String, Object> mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = date;
@@ -60,7 +60,7 @@ public class Film implements Comparable<Film> {
         this.likes = list;
     }
 
-    public Film(long id, String name, String description, LocalDate date, int duration, HashMap mpa) {
+    public Film(long id, String name, String description, LocalDate date, int duration, HashMap<String, Object> mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -68,6 +68,17 @@ public class Film implements Comparable<Film> {
         this.duration = duration;
         this.mpa = mpa;
     }
+
+    public Film(long id, String name, String description, LocalDate date, int duration, HashMap<String, Object> mpa, List<Integer> genres) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = date;
+        this.duration = duration;
+        this.mpa = mpa;
+        this.genres = genres;
+    }
+
 
     public Film(long id, String name, String description, LocalDate date, int duration) {
         this.id = id;

@@ -1,13 +1,3 @@
-INSERT INTO RATING_MPA (TITLE)
-VALUES ('G');
-INSERT INTO RATING_MPA (TITLE)
-VALUES ('PG');
-INSERT INTO RATING_MPA (TITLE)
-VALUES ('PG-13');
-INSERT INTO RATING_MPA (TITLE)
-VALUES ('R');
-INSERT INTO RATING_MPA (TITLE)
-VALUES ('NC-17');
 
 INSERT INTO FILMS(TITLE, DESCRIPTION, RELEASE_DATE, DURATION, mpa)
 VALUES ('Крадущийся тигр затаившийся дракон', 'описание Крадущийся тигр затаившийся дракон', '2003-03-03', 120, 3);
@@ -42,20 +32,6 @@ INSERT INTO USERS (email, login, name, birthday)
 VALUES ('mail@mail6.ru', 'Мыр', 'фаня', '1994-08-04');
 INSERT INTO USERS (email, login, name, birthday)
 VALUES ('mail@mail63.ru', 'Искорка', 'искорка', '2012-01-01');
-
-INSERT INTO GENRES (TITLE)
-VALUES ('Комедия');
-INSERT INTO GENRES (TITLE)
-VALUES ('Драма');
-INSERT INTO GENRES (TITLE)
-VALUES ('Мультфильм');
-INSERT INTO GENRES (TITLE)
-VALUES ('Триллер');
-INSERT INTO GENRES (TITLE)
-VALUES ('Документальный');
-INSERT INTO GENRES (TITLE)
-VALUES ('Боевик');
-
 
 INSERT INTO FILMS_GENRES
 VALUES (1, 2);

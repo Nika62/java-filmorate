@@ -8,6 +8,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.RequestDataBaseException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -27,11 +29,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class FilmDbStorage implements FilmStorage {
+
     private final JdbcTemplate jdbcTemplate;
-
-
     @Override
     public Film addFilm(Film film) {
+
         String sqlInsert = "INSERT INTO films (title, description, release_date, duration, mpa) VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         try {
@@ -47,7 +49,7 @@ public class FilmDbStorage implements FilmStorage {
             film.setId(keyHolder.getKey().longValue());
             log.info("Фильм {} добавлен в базу", film);
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при добавлении фильма {}.", film);
+            log.info("Произошла ошибка при добавлении фильма {}.", e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при добавлении фильма " + film);
         }
         return film;
@@ -68,11 +70,8 @@ public class FilmDbStorage implements FilmStorage {
                 throw new RequestDataBaseException("Произошла ошибка при обновлении фильма " + film);
             }
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при обновлении фильма {}.", film);
-            e.getMessage();
-            e.getStackTrace();
-            throw new RuntimeException(e);
-//             throw new RequestDataBaseException("Произошла ошибка при обновлении фильма " +film);
+            log.info("Произошла ошибка при обновлении фильма {}", e.getMessage());
+            throw new RequestDataBaseException("Произошла ошибка при обновлении фильма " + film);
         }
     }
 
@@ -89,9 +88,10 @@ public class FilmDbStorage implements FilmStorage {
                 "group by f.id;";
         try {
             return jdbcTemplate.query(sql, this::mapRowToFilm);
+
         } catch (DataAccessException e) {
-            log.info("Произщшла ошибка при запросе всех фильмов");
-            throw new RequestDataBaseException("Произщшла ошибка при запросе всех фильмов");
+            log.info("Произошла ошибка при запросе всех фильмов: {}", e.getMessage());
+            throw new RequestDataBaseException("Произошла ошибка при запросе всех фильмов");
         }
     }
 
@@ -107,11 +107,11 @@ public class FilmDbStorage implements FilmStorage {
                 "       group_concat(FG.GENRE_ID)\n" +
                 "FROM films AS f JOIN RATING_MPA AS r ON f.MPA = r.id JOIN FILMS_GENRES AS FG ON f.ID = FG.FILM_ID\n" +
                 "WHERE f.id = ?\n" +
-                "GROUP BY f.ID;";
+                "GROUP BY FG.FILM_ID;";
         try {
             return jdbcTemplate.queryForObject(sql, this::mapRowToFilm, id);
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при поиске фильма с id={}", id);
+            log.info("Произошла ошибка при поиске фильма с {}", e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при поиске фильма с id=" + id);
         }
     }
@@ -122,7 +122,7 @@ public class FilmDbStorage implements FilmStorage {
             log.info("Пользователь с id={} лайкнул фильм с id={}", userId, filmId);
             return jdbcTemplate.update(sqlAddLike, userId, filmId) > 0;
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при добавлении пользователем с id={} лайка фильму с id={}", userId, filmId);
+            log.info("Произошла ошибка при добавлении пользователем с id={} лайка фильму с id={}, {}", userId, filmId, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при добавлении пользователем с id=" + userId + " лайка фильму с id=" + filmId);
         }
     }
@@ -133,7 +133,7 @@ public class FilmDbStorage implements FilmStorage {
             log.info("Пользователь с id={} удалил лайк  у фильма с id={}", userId, filmId);
             return jdbcTemplate.update(sqlAddLike, userId, filmId) > 0;
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при удалении пользователем с id={} лайка фильму с id={}", userId, filmId);
+            log.info("Произошла ошибка при удалении пользователем с id={} лайка фильму с id={}, {}", userId, filmId, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при удалении пользователем с id=" + userId + " лайка фильму с id=" + filmId);
         }
     }
@@ -174,6 +174,22 @@ public class FilmDbStorage implements FilmStorage {
                 .mpa(mpaMap)
                 .genres(stringConvertList(resultSet.getString(8)))
                 .build();
+    }
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void deleteAllFilms() {
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+        String sql = "TRUNCATE TABLE FILMS restart identity";
+        jdbcTemplate.execute(sql);
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+    }
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void deleteAllLikesFilms() {
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+        String sql = "TRUNCATE TABLE USERS_LIKE_FILMS restart identity";
+        jdbcTemplate.execute(sql);
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
     }
 
     private List<Integer> stringConvertList(String str) {

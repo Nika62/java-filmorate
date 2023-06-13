@@ -8,6 +8,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.RequestDataBaseException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -157,9 +159,20 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void deleteAllUsers() {
-        String sql = "DELETE FROM users;";
-        jdbcTemplate.update(sql);
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+        String sql = "TRUNCATE TABLE users restart identity";
+        jdbcTemplate.execute(sql);
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+    }
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void deleteAllFriends() {
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+        String sql = "TRUNCATE TABLE FRIENDSHIP restart identity";
+        jdbcTemplate.execute(sql);
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
     }
 
     private void checkUserName(User user) {
