@@ -84,19 +84,20 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
-        String sql = "SELECT f.ID,\n" +
+        String sql = "SELECT  f.ID,\n" +
                 "                     f.TITLE,\n" +
                 "                      f.DESCRIPTION,\n" +
                 "                    f.RELEASE_DATE,\n" +
                 "                      f.DURATION,\n" +
                 "                      f.mpa,\n" +
                 "                     r.TITLE,\n" +
-                "                     g.ID,g.TITLE\n" +
+                "                     GROUP_CONCAT(DISTINCT g.ID) DESC,\n" +
+                "                     GROUP_CONCAT(DISTINCT g.TITLE)\n" +
                 "FROM films AS f\n" +
                 "JOIN RATING_MPA AS r ON f.MPA = r.id\n" +
                 "JOIN FILMS_GENRES as fg ON fg.FILM_ID=f.ID\n" +
                 "JOIN GENRES as g ON fg.GENRE_ID=g.ID\n" +
-                " GROUP BY fg.GENRE_ID,g.id";
+                "GROUP BY f.ID;";
         try {
             List<Film> films = jdbcTemplate.query(sql, this::mapRowToFilm);
             return films;
@@ -115,16 +116,15 @@ public class FilmDbStorage implements FilmStorage {
                 "                      f.DURATION,\n" +
                 "                      f.mpa,\n" +
                 "                     r.TITLE,\n" +
-                "                     g.ID,g.TITLE\n" +
                 "FROM films AS f\n" +
-                "JOIN RATING_MPA AS r ON f.MPA = r.id\n" +
-                "JOIN FILMS_GENRES as fg ON fg.FILM_ID=f.ID\n" +
-                "JOIN GENRES as g ON fg.GENRE_ID=g.ID\n" +
-                "WHERE f.id = ? GROUP BY fg.GENRE_ID,g.id";
+                "JOIN RATING_MPA AS r ON f.MPA = r.id " +
+                "WHERE F.ID= ?";
 
-        String sqlGenres = "SELECT GROUP_CONTACT(USER_ID) WHERE FILM_ID =?;";
+        String sqlGenre = "Select DISTINCT * FROM GENRES AS g JOIN FILMS_GENRES as fg ON fg.genre_id = g.id WHERE fg.film_id = ? ORDER BY g.ID;";
         try {
             Film film = jdbcTemplate.queryForObject(sql, this::mapRowToFilm, id);
+            List<Genre> listGenres = jdbcTemplate.query(sqlGenre, this::mapRowGenres, id);
+            film.setGenres(listGenresToListHashMap(listGenres));
             return film;
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при поиске фильма c id = {}, {}", id, e.getMessage());
@@ -181,32 +181,25 @@ public class FilmDbStorage implements FilmStorage {
         HashMap<String, Object> mpaMap = new HashMap<>();
         mpaMap.put("id", resultSet.getInt(6));
         mpaMap.put("name", resultSet.getString(7));
-        List<HashMap<String, Object>> genres = new ArrayList<>();
-        Film film = null;
-
-        while (resultSet.next()) {
-            if (film == null) {
-                film = new Film((resultSet.getLong(1)), (resultSet.getString(2)), (resultSet.getString(3)),
-                        (resultSet.getDate(4).toLocalDate()), (resultSet.getInt(5)), mpaMap, genres);
-            }
-            Genre genre = new Genre(resultSet.getInt(8), resultSet.getString(9));
-            genres.add(genre.toMap());
-        }
-        if (film == null) {
-            film = new Film((resultSet.getLong(1)), (resultSet.getString(2)), (resultSet.getString(3)),
-                    (resultSet.getDate(4).toLocalDate()), (resultSet.getInt(5)), mpaMap, genres);
-        }
-        return film;
+        return new Film((resultSet.getLong(1)), (resultSet.getString(2)), (resultSet.getString(3)),
+                (resultSet.getDate(4).toLocalDate()), (resultSet.getInt(5)), mpaMap);
     }
 
-    private List<HashMap<String, Object>> arrayToListHashMap(String[] array) {
-        List<HashMap<String, Object>> genres = new ArrayList<>();
-        for (int i = 0; i < array.length; i++) {
+    private Genre mapRowGenres(ResultSet rs, int rowNum) throws SQLException {
+        return new Genre(rs.getInt("id"), rs.getString("title"));
+
+
+    }
+
+    private List<HashMap<String, Object>> listGenresToListHashMap(List<Genre> list) {
+        List<HashMap<String, Object>> result = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
             HashMap<String, Object> map = new HashMap<>();
-            map.put("id", array[i]);
-            genres.add(map);
+            map.put("id", list.get(i).getId());
+            map.put("name", list.get(i).getName());
+            result.add(map);
         }
-        return genres;
+        return result;
     }
 
     private void updateGenreFilms(Film film) {
