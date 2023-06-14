@@ -31,7 +31,7 @@ public class Film implements Comparable<Film> {
     private int duration;
     @NonNull
     @EqualsAndHashCode.Exclude
-    private HashMap<String, Object> mpa = new HashMap<>();
+    private Map<String, Object> mpa = new HashMap<>();
     @EqualsAndHashCode.Exclude
     private List<HashMap<String, Object>> genres = new ArrayList<>();
 
