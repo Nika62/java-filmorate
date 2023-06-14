@@ -147,7 +147,11 @@ class UserDbStorageTest {
     }
     @Test
     void shouldGetListMutualFriends() {
-
+        List<User> friends = userDbStorage.getListMutualFriends(5l, 2l);
+        assertAll(
+                () -> assertEquals(friends.size(), 1),
+                () -> assertEquals(friends.get(0).getName(), "искорка")
+        );
     }
     @Test
     void shouldGetListFriendsUser() {

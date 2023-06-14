@@ -15,7 +15,6 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Film implements Comparable<Film> {
     @EqualsAndHashCode.Exclude
@@ -34,7 +33,7 @@ public class Film implements Comparable<Film> {
     @EqualsAndHashCode.Exclude
     private HashMap<String, Object> mpa = new HashMap<>();
     @EqualsAndHashCode.Exclude
-    private List<Integer> genres = new ArrayList<>();
+    private List<HashMap<String, Object>> genres = new ArrayList<>();
 
     public Film(String name, String description, LocalDate date, int duration, HashMap<String, Object> mpa) {
         this.name = name;
@@ -69,7 +68,7 @@ public class Film implements Comparable<Film> {
         this.mpa = mpa;
     }
 
-    public Film(long id, String name, String description, LocalDate date, int duration, HashMap<String, Object> mpa, List<Integer> genres) {
+    public Film(long id, String name, String description, LocalDate date, int duration, HashMap<String, Object> mpa, List<HashMap<String, Object>> genres) {
         this.id = id;
         this.name = name;
         this.description = description;

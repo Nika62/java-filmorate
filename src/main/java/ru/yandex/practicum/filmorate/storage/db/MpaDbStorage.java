@@ -36,7 +36,7 @@ public class MpaDbStorage implements MpaStorage {
             mpa.setId(keyHolder.getKey().intValue());
             log.info("Новая категория рейтинга {} добавлена в базу", mpa);
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при добавлении категории рейтинга {}.", mpa);
+            log.info("Произошла ошибка при добавлении категории рейтинга {}, {}.", mpa, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при добавлении категории рейтинга " + mpa);
         }
         return mpa;
@@ -55,7 +55,7 @@ public class MpaDbStorage implements MpaStorage {
                 throw new RequestDataBaseException("Произошла ошибка при обновлении категории рейтинга " + mpa);
             }
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при обновлении катигории рейтинга {}.", mpa);
+            log.info("Произошла ошибка при обновлении катигории рейтинга {}, {}", mpa, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при обновлении категории рейтинга " + mpa);
         }
     }
@@ -72,18 +72,18 @@ public class MpaDbStorage implements MpaStorage {
         try {
             return jdbcTemplate.queryForObject(sql, this::mapRowToMpa, id);
         } catch (Exception e) {
-            log.info("Произошла ошибка при поиске категории рейтинга с id={}", id);
+            log.info("Произошла ошибка при поиске категории рейтинга с id={}, {}", id, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при поиске категории рейтинга с id=" + id);
         }
     }
 
     @Override
     public List<Mpa> getAllMpa() {
-        String sql = "SELECT * FROM RATING_MPA;";
+        String sql = "SELECT * FROM RATING_MPA GROUP BY ID;";
         try {
             return jdbcTemplate.query(sql, this::mapRowToMpa);
         } catch (Exception e) {
-            log.info("Произошла ошибка при запросе всех категорий рейтинга");
+            log.info("Произошла ошибка при запросе всех категорий рейтинга {}", e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при запросе всех категорий рейтинга");
         }
     }

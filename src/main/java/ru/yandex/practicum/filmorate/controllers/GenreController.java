@@ -38,7 +38,6 @@ public class GenreController {
         }
         return genreService.getGenreById(id.get());
     }
-
     @DeleteMapping
     public boolean deleteGenre(@RequestBody Genre genre) {
         return genreService.deleteGenre(genre);

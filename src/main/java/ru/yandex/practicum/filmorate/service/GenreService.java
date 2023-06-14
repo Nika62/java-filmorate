@@ -31,4 +31,5 @@ public class GenreService {
     public List<Genre> getAllGenres() {
         return genreStorage.getAllGenres();
     }
+
 }

@@ -36,7 +36,7 @@ public class GenreDbStorage implements GenreStorage {
             genre.setId(keyHolder.getKey().intValue());
             log.info("Жанр {} добавлен в базу", genre);
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при добавлении жанра {}.", genre);
+            log.info("Произошла ошибка при добавлении жанра {}.", e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при добавлении жанра " + genre);
         }
         return genre;
@@ -55,7 +55,7 @@ public class GenreDbStorage implements GenreStorage {
                 throw new RequestDataBaseException("Произошла ошибка при обновлении жанра " + genre);
             }
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при обновлении жанра {}.", genre);
+            log.info("Произошла ошибка при обновлении жанра {}.", e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при обновлении жанра " + genre);
         }
     }
@@ -73,7 +73,7 @@ public class GenreDbStorage implements GenreStorage {
         try {
             return jdbcTemplate.queryForObject(sql, this::mapRowToGenres, id);
         } catch (Exception e) {
-            log.info("Произошла ошибка при поиске жанра с id={}", id);
+            log.info("Произошла ошибка при поиске жанра с id={}, {}", id, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при поиске жанра с id=" + id);
         }
     }
@@ -84,7 +84,7 @@ public class GenreDbStorage implements GenreStorage {
         try {
             return jdbcTemplate.query(sql, this::mapRowToGenres);
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при запросе всех жанров");
+            log.info("Произошла ошибка при запросе всех жанров {}", e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при запросе всех жанров");
         }
     }
@@ -94,4 +94,5 @@ public class GenreDbStorage implements GenreStorage {
                 rs.getString(2)
         );
     }
+
 }

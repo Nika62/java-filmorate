@@ -8,8 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.RequestDataBaseException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -48,7 +46,7 @@ public class UserDbStorage implements UserStorage {
             user.setId(keyHolder.getKey().longValue());
             log.info("Пользователь {} добавлен в базу", user);
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при добавлении пользователя {}.", user);
+            log.info("Произошла ошибка при добавлении пользователя {}, {}", user, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при добавлении пользователя " + user);
         }
         return user;
@@ -63,11 +61,11 @@ public class UserDbStorage implements UserStorage {
                 log.info("Пользователь обновлен {}.", user);
                 return user;
             } else {
-                log.info("Произошла ошибка при обновлении пользователя {}.", user);
+                log.info("Произошла ошибка при обновлении пользователя {}", user);
                 throw new RequestDataBaseException("Произошла ошибка при обновлении пользователя " + user);
             }
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при обновлении пользователя {}.", user);
+            log.info("Произошла ошибка при обновлении пользователя {} , {}", user, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при обновлении пользователя " + user);
         }
     }
@@ -84,7 +82,7 @@ public class UserDbStorage implements UserStorage {
         try {
             return jdbcTemplate.query(sql, this::mapRowToUser);
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при запросе всех пользователей");
+            log.info("Произошла ошибка при запросе всех пользователей {}", e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при запросе всех пользователей");
         }
     }
@@ -95,7 +93,7 @@ public class UserDbStorage implements UserStorage {
         try {
             return jdbcTemplate.queryForObject(sql, this::mapRowToUser, id);
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при поиске пользователя с id={}", id);
+            log.info("Произошла ошибка при поиске пользователя с id={}, {}", id, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при поиске пользователя с id=" + id);
         }
     }
@@ -104,9 +102,9 @@ public class UserDbStorage implements UserStorage {
     public boolean addFriend(long userId, long friendId) {
         String sqlAddFriend = "INSERT INTO FRIENDSHIP (USER_WHO_SEND_ID, USER_MUST_CONFIRM_ID, STATUS) VALUES(?, ?, ?);";
         try {
-            return jdbcTemplate.update(sqlAddFriend, userId, friendId, "not_approved") > 0;
+            return jdbcTemplate.update(sqlAddFriend, userId, friendId, "approved") > 0;
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при отправке заявки на дружбу пользователя с id={} к пользователю с id={}", userId, friendId);
+            log.info("Произошла ошибка при отправке заявки на дружбу пользователя с id={} к пользователю с id={}, {}", userId, friendId, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при отправке заявки на дружбу пользователя с id=" + userId +
                     " к пользователю с id=" + friendId);
         }
@@ -120,7 +118,7 @@ public class UserDbStorage implements UserStorage {
             return jdbcTemplate.update(sqlDeleteFriend, userId, friendId, userId, friendId) > 0;
 
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при удалении заявки на дружбу пользователя с id={} к пользователю с id={}", userId, friendId);
+            log.info("Произошла ошибка при удалении заявки на дружбу пользователя с id={} к пользователю с id={}, {}", userId, friendId, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при удалении заявки на дружбу пользователя с id=" + userId +
                     " к пользователю с id=" + friendId);
         }
@@ -128,59 +126,30 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getListMutualFriends(long userId, long friendId) {
-        String sql = "select *\n" +
-                "from users u\n" +
-                "where u.id in\n" +
-                "      (select f1.user_must_confirm_id\n" +
-                "       from friendship f1\n" +
-                "       where f1.user_who_send_id in(?, ?) and f1.status = 'approved'\n" +
-                "       group by f1.user_must_confirm_id\n" +
-                "       having f1.user_must_confirm_id in (select f2.user_who_send_id\n" +
-                "                                          from friendship f2\n" +
-                "                                          where f2.user_must_confirm_id in(?, ?) and f2.status = 'approved'));";
+        String sql = "select *from users u where u.id in (select f1.user_must_confirm_id from friendship f1 where f1.user_who_send_id in(?, ?) AND USER_MUST_CONFIRM_ID NOT IN (?, ?));";
         try {
-            return jdbcTemplate.query(sql, this::mapRowToUser, userId, friendId);
+            return jdbcTemplate.query(sql, this::mapRowToUser, userId, friendId, userId, friendId);
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при запросе общих друзей у пользователей с id={}, id={}", userId, friendId);
+            log.info("Произошла ошибка при запросе общих друзей у пользователей с id={}, id={}, {}", userId, friendId, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при запросе общих друзей у пользователей с id=" + userId + ", id=" + friendId);
         }
     }
 
     @Override
     public List<User> getListFriendsUser(long userId) {
-        String sql = "SELECT u.ID, u.EMAIL, u.LOGIN, u.NAME, u.BIRTHDAY FROM USERS as u\n" +
-                "WHERE u.ID IN (SELECT USER_MUST_CONFIRM_ID FROM FRIENDSHIP WHERE USER_WHO_SEND_ID =? and STATUS = 'approved')" +
-                "or u.id in (SELECT USER_WHO_SEND_ID FROM FRIENDSHIP WHERE USER_MUST_CONFIRM_ID =? and STATUS = 'approved');";
+        String sql = "SELECT *  FROM USERS as u WHERE u.ID IN (SELECT USER_MUST_CONFIRM_ID FROM FRIENDSHIP WHERE USER_WHO_SEND_ID =?)";
         try {
-            return jdbcTemplate.query(sql, this::mapRowToUser, userId, userId);
+            return jdbcTemplate.query(sql, this::mapRowToUser, userId);
         } catch (DataAccessException e) {
-            log.info("Произошла ошибка при запросе друзей пользователя с id={}", userId);
+            log.info("Произошла ошибка при запросе друзей пользователя с id={}, {}", userId, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при запросе друзей пользователя с id=" + userId);
         }
     }
-
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public void deleteAllUsers() {
-        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
-        String sql = "TRUNCATE TABLE users restart identity";
-        jdbcTemplate.execute(sql);
-        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
-    }
-
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public void deleteAllFriends() {
-        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
-        String sql = "TRUNCATE TABLE FRIENDSHIP restart identity";
-        jdbcTemplate.execute(sql);
-        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
-    }
-
     private void checkUserName(User user) {
-        if (Objects.isNull(user.getName())) {
+        if (Objects.isNull(user.getName()) || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
     }
-
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
         return new User(
                 rs.getLong("id"),

@@ -37,7 +37,7 @@ public class FilmService {
     }
 
     public boolean addLikeFilm(long filmId, long userId) {
-        return filmStorage.getFilmById(filmId).addLike(userId);
+        return filmStorage.addLikeFilm(filmId, userId);
     }
 
     public boolean deleteLikeFilm(long filmId, long userId) {
@@ -45,6 +45,6 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilms(int count) {
-        return getPopularFilms(count);
+        return filmStorage.getPopularFilms(count);
     }
 }
