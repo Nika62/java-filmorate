@@ -45,11 +45,13 @@ public class FilmController {
         }
         return filmService.getFilmById(id.get());
     }
+
     @PutMapping("/{id}/like/{userId}")
     public boolean addLikeFilm(@PathVariable Optional<Long> id, @PathVariable Optional<Long> userId) {
         checkById(id, userId);
         return filmService.addLikeFilm(id.get(), userId.get());
     }
+
     @DeleteMapping("/{id}/like/{userId}")
     public boolean deleteLikeFilm(@PathVariable Optional<Long> id, @PathVariable Optional<Long> userId) {
         checkById(id, userId);

@@ -45,7 +45,6 @@ class FilmControllerTest {
 
     }
 
-
     @SneakyThrows
     @ParameterizedTest
     @MethodSource("filmsSave")
