@@ -51,11 +51,12 @@ class FilmDbStorageTest {
                 });
         assertEquals("Произошла ошибка при добавлении фильма " + testFilm, e.getMessage());
     }
+
     @Test
     void shouldUpdateFilm() {
         HashMap<String, Object> mpa = new HashMap<>();
         mpa.put("id", 1);
-        Film forUpdateFilm = new Film(1l, "Приручить поросенка", "описание", LocalDate.parse("2008-08-08"), 177, mpa);
+        Film forUpdateFilm = new Film(1L, "Приручить поросенка", "описание", LocalDate.parse("2008-08-08"), 177, mpa);
         Film afterUpdateFilm = filmDbStorage.updateFilm(forUpdateFilm);
         assertAll(
                 () -> assertEquals(afterUpdateFilm.getId(), 1),
@@ -85,8 +86,8 @@ class FilmDbStorageTest {
         mpa.put("id", 1);
         Film film = new Film(1, "Крадущийся тигр затаившийся дракон", "описание Крадущийся тигр затаившийся дракон", LocalDate.parse("2003-03-03"), 120, mpa);
         assertTrue(filmDbStorage.deleteFilm(film));
-
     }
+
     @Test
     void shouldDeleteFilmIdNotInDb() {
         HashMap<String, Object> mpa = new HashMap<>();
@@ -127,7 +128,7 @@ class FilmDbStorageTest {
 
     @Test
     void getFilmByMiddleId() {
-        Film returnedByIdFilm = filmDbStorage.getFilmById(3l);
+        Film returnedByIdFilm = filmDbStorage.getFilmById(3L);
         assertAll(
                 () -> assertEquals(returnedByIdFilm.getId(), 3),
                 () -> assertEquals(returnedByIdFilm.getName(), "Смешарики"),
@@ -137,6 +138,7 @@ class FilmDbStorageTest {
                 () -> assertEquals(returnedByIdFilm.getMpa().get("id"), 1)
         );
     }
+
     @Test
     void shouldExceptionGetFilmById() {
         Exception e = Assertions.assertThrows(RequestDataBaseException.class,
@@ -151,6 +153,7 @@ class FilmDbStorageTest {
     void shouldAddLikeFilm() {
         assertTrue(filmDbStorage.addLikeFilm(2, 5));
     }
+
     @Test
     void shouldExceptionAddLikeFilm() {
         Exception e = Assertions.assertThrows(RequestDataBaseException.class,
@@ -161,13 +164,12 @@ class FilmDbStorageTest {
     }
 
     @Test
-
     void shouldDeleteLikeFilm() {
         assertTrue(filmDbStorage.deleteLikeFilm(1, 1));
     }
 
     @Test
-    void shoulExceptionDeleteLikeFilm() {
+    void shouldExceptionDeleteLikeFilm() {
         Exception e = Assertions.assertThrows(RequestDataBaseException.class,
                 () -> {
                     filmDbStorage.deleteLikeFilm(1, 67);

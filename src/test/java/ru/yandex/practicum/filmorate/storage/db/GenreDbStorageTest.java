@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class GenreDbStorageTest {
+
     private final GenreDbStorage genreDbStorage;
 
     @Test
