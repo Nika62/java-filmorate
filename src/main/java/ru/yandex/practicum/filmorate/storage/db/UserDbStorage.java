@@ -145,11 +145,13 @@ public class UserDbStorage implements UserStorage {
             throw new RequestDataBaseException("Произошла ошибка при запросе друзей пользователя с id=" + userId);
         }
     }
+
     private void checkUserName(User user) {
         if (Objects.isNull(user.getName()) || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
     }
+
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
         return new User(
                 rs.getLong("id"),

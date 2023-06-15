@@ -118,6 +118,7 @@ public class FilmDbStorage implements FilmStorage {
             throw new RequestDataBaseException("Произошла ошибка при поиске фильма с id=" + id);
         }
     }
+
     public boolean addLikeFilm(long filmId, long userId) {
         String sqlAddLike = "INSERT INTO USERS_LIKE_FILMS (user_id, film_id) VALUES(?, ?);";
         try {
