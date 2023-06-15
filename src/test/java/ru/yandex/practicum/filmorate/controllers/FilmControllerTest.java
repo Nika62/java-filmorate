@@ -45,11 +45,11 @@ class FilmControllerTest {
 
     }
 
+
     @SneakyThrows
     @ParameterizedTest
     @MethodSource("filmsSave")
     void shouldValidationFailed(Film film, int status) {
-
         mockMvc.perform(
                 post("/films")
                         .content(objectMapper.writeValueAsString(film))
