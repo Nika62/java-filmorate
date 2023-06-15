@@ -49,7 +49,7 @@ class UserDbStorageTest {
 
     @Test
     void updateUser() {
-        User userForUpdate = new User(1l, "userUp@mail.com", "logUp", "nameUp", LocalDate.parse("2010-12-13"));
+        User userForUpdate = new User(1L, "userUp@mail.com", "logUp", "nameUp", LocalDate.parse("2010-12-13"));
         User returnedUser = userDbStorage.updateUser(userForUpdate);
         assertAll(
                 () -> assertEquals(returnedUser.getId(), 1),
