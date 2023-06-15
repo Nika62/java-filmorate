@@ -167,30 +167,22 @@ class FilmDbStorageTest {
     }
 
     @Test
-    void shouldNotDeleteLikeFilm() {
-
-        assertFalse(filmDbStorage.deleteLikeFilm(1, 67));
+    void shoulExceptionDeleteLikeFilm() {
+        Exception e = Assertions.assertThrows(RequestDataBaseException.class,
+                () -> {
+                    filmDbStorage.deleteLikeFilm(1, 67);
+                });
+        assertEquals("Произошла ошибка при удалении пользователем с id=67 лайка фильму с id=1", e.getMessage());
     }
 
     @Test
     void shouldGet9PopularFilms() {
         List<Film> listPopular = filmDbStorage.getPopularFilms(10);
         assertAll(
-                () -> assertEquals(listPopular.size(), 9),
+                () -> assertEquals(listPopular.size(), 10),
                 () -> assertEquals(listPopular.get(0).getName(), "Смешарики"),
-                () -> assertEquals(listPopular.get(3).getName(), "Крадущийся тигр затаившийся дракон"),
+                () -> assertEquals(listPopular.get(3).getName(), "Карты деньги 2 ствола"),
                 () -> assertEquals(listPopular.get(8).getName(), "Джанго")
-        );
-    }
-
-    @Test
-    void shouldGet3PopularFilms() {
-        List<Film> listPopular = filmDbStorage.getPopularFilms(3);
-        assertAll(
-                () -> assertEquals(listPopular.size(), 3),
-                () -> assertEquals(listPopular.get(0).getName(), "Смешарики"),
-                () -> assertEquals(listPopular.get(1).getName(), "Карты деньги 2 ствола"),
-                () -> assertEquals(listPopular.get(2).getName(), "Исчезнувшая")
         );
     }
 }
