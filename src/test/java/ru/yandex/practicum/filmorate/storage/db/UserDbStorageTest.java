@@ -21,21 +21,24 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class UserDbStorageTest {
     private final UserDbStorage userDbStorage;
+
     @Test
     void shouldAddUser() {
         User userForAddDb = new User("user@mail.com", "log", "name", LocalDate.parse("2010-12-13"));
         User returnedUser = userDbStorage.addUser(userForAddDb);
         assertAll(
-                () -> assertEquals(returnedUser.getId(), 7),
+                () -> assertEquals(returnedUser.getId(), 1),
                 () -> assertEquals(returnedUser.getEmail(), "user@mail.com"),
                 () -> assertEquals(returnedUser.getLogin(), "log"),
                 () -> assertEquals(returnedUser.getName(), "name"),
                 () -> assertEquals(returnedUser.getBirthday(), LocalDate.parse("2010-12-13"))
         );
     }
+
     @Test
     void shouldExceptionAddUser() {
         User userForAddDb = new User("mail@mail2.ru", "login", "name", LocalDate.parse("1990-02-01"));
+        userDbStorage.addUser(userForAddDb);
         Exception e = Assertions.assertThrows(RequestDataBaseException.class,
                 () -> {
                     userDbStorage.addUser(userForAddDb);
@@ -43,9 +46,12 @@ class UserDbStorageTest {
 
         assertEquals("Произошла ошибка при добавлении пользователя " + userForAddDb, e.getMessage());
     }
+
     @Test
     void updateUser() {
-        User userForUpdate = new User(1l, "userUp@mail.com", "logUp", "nameUp", LocalDate.parse("2010-12-13"));
+        User userForAddDb = new User("user@mail.com", "log", "name", LocalDate.parse("2010-12-13"));
+        userDbStorage.addUser(userForAddDb);
+        User userForUpdate = new User(1L, "userUp@mail.com", "logUp", "nameUp", LocalDate.parse("2010-12-13"));
         User returnedUser = userDbStorage.updateUser(userForUpdate);
         assertAll(
                 () -> assertEquals(returnedUser.getId(), 1),
@@ -55,6 +61,7 @@ class UserDbStorageTest {
                 () -> assertEquals(returnedUser.getBirthday(), LocalDate.parse("2010-12-13"))
         );
     }
+
     @Test
     void shouldExceptionUpdateUser() {
         User userForUpdate = new User(23, "mail@mail2.ru", "login", "name", LocalDate.parse("1990-02-01"));
@@ -68,64 +75,92 @@ class UserDbStorageTest {
 
     @Test
     void shouldDeleteUser() {
-        boolean resultDelete = userDbStorage.deleteUser(new User(4, "mail@mail2.ru", "login", "name", LocalDate.parse("1990-02-01")));
+        User userForAddDb = new User("user@mail.com", "log", "name", LocalDate.parse("2010-12-13"));
+        userDbStorage.addUser(userForAddDb);
+        boolean resultDelete = userDbStorage.deleteUser(new User(1L, "mail@mail2.ru", "login", "name", LocalDate.parse("1990-02-01")));
         assertTrue(resultDelete);
 
     }
+
     @Test
     void shouldDeleteUserIdNotInDb() {
         boolean resultDelete = userDbStorage.deleteUser(new User(101, "mail@mail2.ru", "login", "name", LocalDate.parse("1990-02-01")));
         assertFalse(resultDelete);
     }
+
     @Test
     void shouldGetAllUsers() {
+        User userForAddDb = new User("user@mail.com", "log", "name", LocalDate.parse("2010-12-13"));
+        User userForAddDb2 = new User("user@mail2.com", "log2", "name2", LocalDate.parse("2010-12-13"));
+        User userForAddDb3 = new User("user@mail3.com", "log3", "name3", LocalDate.parse("2010-12-13"));
+        userDbStorage.addUser(userForAddDb);
+        userDbStorage.addUser(userForAddDb2);
+        userDbStorage.addUser(userForAddDb3);
         List<User> returnedListUsers = userDbStorage.getAllUsers();
         System.out.println(returnedListUsers);
         assertAll(
                 () -> assertEquals(returnedListUsers.get(0).getName(), "name"),
                 () -> assertEquals(returnedListUsers.get(0).getId(), 1),
-                () -> assertEquals(returnedListUsers.get(5).getId(), 6),
-                () -> assertEquals(returnedListUsers.get(5).getName(), "искорка"),
+                () -> assertEquals(returnedListUsers.get(1).getId(), 2),
+                () -> assertEquals(returnedListUsers.get(2).getId(), 3),
+                () -> assertEquals(returnedListUsers.get(0).getName(), "name"),
                 () -> assertTrue(Objects.nonNull(returnedListUsers.get(0).getEmail()) && Objects.nonNull(returnedListUsers.get(0).getLogin())
                         && Objects.nonNull(returnedListUsers.get(0).getBirthday()))
         );
     }
+
     @Test
     void shouldGetUserById1() {
-        User returnedByIdUser = userDbStorage.getUserById(1l);
+        User userForAddDb = new User("user@mail.com", "log", "name", LocalDate.parse("2010-12-13"));
+        userDbStorage.addUser(userForAddDb);
+        User returnedByIdUser = userDbStorage.getUserById(1L);
         assertAll(
                 () -> assertEquals(returnedByIdUser.getId(), 1),
-                () -> assertEquals(returnedByIdUser.getEmail(), "mail@mail2.ru"),
-                () -> assertEquals(returnedByIdUser.getLogin(), "login"),
+                () -> assertEquals(returnedByIdUser.getEmail(), "user@mail.com"),
+                () -> assertEquals(returnedByIdUser.getLogin(), "log"),
                 () -> assertEquals(returnedByIdUser.getName(), "name"),
-                () -> assertEquals(returnedByIdUser.getBirthday(), LocalDate.parse("1990-02-01"))
+                () -> assertEquals(returnedByIdUser.getBirthday(), LocalDate.parse("2010-12-13"))
         );
     }
+
     @Test
     void shouldGetUserByMiddleId() {
-        User returnedByIdUser = userDbStorage.getUserById(3l);
+        User userForAddDb = new User("user@mail.com", "log", "name", LocalDate.parse("2010-12-13"));
+        User userForAddDb2 = new User("user@mail2.com", "log2", "name2", LocalDate.parse("2010-12-13"));
+        User userForAddDb3 = new User("user@mail3.com", "log3", "name3", LocalDate.parse("2010-12-13"));
+        userDbStorage.addUser(userForAddDb);
+        userDbStorage.addUser(userForAddDb2);
+        userDbStorage.addUser(userForAddDb3);
+        User returnedByIdUser = userDbStorage.getUserById(2L);
         assertAll(
-                () -> assertEquals(returnedByIdUser.getId(), 3),
-                () -> assertEquals(returnedByIdUser.getEmail(), "mail@mail4.ru"),
-                () -> assertEquals(returnedByIdUser.getLogin(), "Дарт Вейдер"),
-                () -> assertEquals(returnedByIdUser.getName(), "Энакин"),
-                () -> assertEquals(returnedByIdUser.getBirthday(), LocalDate.parse("1992-07-11"))
+                () -> assertEquals(returnedByIdUser.getId(), 2),
+                () -> assertEquals(returnedByIdUser.getEmail(), "user@mail2.com"),
+                () -> assertEquals(returnedByIdUser.getLogin(), "log2"),
+                () -> assertEquals(returnedByIdUser.getName(), "name2"),
+                () -> assertEquals(returnedByIdUser.getBirthday(), LocalDate.parse("2010-12-13"))
         );
     }
+
     @Test
     void shouldExceptionGetUserById() {
         Exception e = Assertions.assertThrows(RequestDataBaseException.class,
                 () -> {
-                    userDbStorage.getUserById(23l);
+                    userDbStorage.getUserById(23L);
                 });
 
         assertEquals("Произошла ошибка при поиске пользователя с id=23", e.getMessage());
     }
+
     @Test
     void shouldAddFriend() {
-        boolean result = userDbStorage.addFriend(1, 3);
+        User userForAddDb = new User("user@mail.com", "log", "name", LocalDate.parse("2010-12-13"));
+        User userForAddDb2 = new User("user@mail2.com", "log2", "name2", LocalDate.parse("2010-12-13"));
+        userDbStorage.addUser(userForAddDb);
+        userDbStorage.addUser(userForAddDb2);
+        boolean result = userDbStorage.addFriend(1, 2);
         assertTrue(result);
     }
+
     @Test
     void shouldExceptionAddFriend() {
         Exception e = Assertions.assertThrows(RequestDataBaseException.class,
@@ -135,31 +170,52 @@ class UserDbStorageTest {
 
         assertEquals("Произошла ошибка при отправке заявки на дружбу пользователя с id=1 к пользователю с id=2", e.getMessage());
     }
+
     @Test
     void shouldDeleteFriend() {
+        User userForAddDb = new User("user@mail.com", "log", "name", LocalDate.parse("2010-12-13"));
+        User userForAddDb2 = new User("user@mail2.com", "log2", "name2", LocalDate.parse("2010-12-13"));
+        userDbStorage.addUser(userForAddDb);
+        userDbStorage.addUser(userForAddDb2);
+        userDbStorage.addFriend(1, 2);
         boolean result = userDbStorage.deleteFriend(1, 2);
         assertTrue(result);
     }
+
     @Test
     void shouldNotDeleteFriend() {
         boolean result = userDbStorage.deleteFriend(1, 3);
         assertFalse(result);
     }
+
     @Test
     void shouldGetListMutualFriends() {
-        List<User> friends = userDbStorage.getListMutualFriends(5l, 2l);
+        User userForAddDb = new User("user@mail.com", "log", "name", LocalDate.parse("2010-12-13"));
+        User userForAddDb2 = new User("user@mail2.com", "log2", "name2", LocalDate.parse("2010-12-13"));
+        User userForAddDb3 = new User("user@mail3.com", "log3", "name3", LocalDate.parse("2010-12-13"));
+        userDbStorage.addUser(userForAddDb);
+        userDbStorage.addUser(userForAddDb2);
+        userDbStorage.addUser(userForAddDb3);
+        userDbStorage.addFriend(1, 2);
+        userDbStorage.addFriend(3, 2);
+        List<User> friends = userDbStorage.getListMutualFriends(1L, 3L);
         assertAll(
                 () -> assertEquals(friends.size(), 1),
-                () -> assertEquals(friends.get(0).getName(), "искорка")
+                () -> assertEquals(friends.get(0).getId(), 2)
         );
     }
+
     @Test
     void shouldGetListFriendsUser() {
-        List<User> friends = userDbStorage.getListFriendsUser(2);
+        User userForAddDb = new User("user@mail.com", "log", "name", LocalDate.parse("2010-12-13"));
+        User userForAddDb2 = new User("user@mail2.com", "log2", "name2", LocalDate.parse("2010-12-13"));
+        userDbStorage.addUser(userForAddDb);
+        userDbStorage.addUser(userForAddDb2);
+        userDbStorage.addFriend(1L, 2L);
+        List<User> friends = userDbStorage.getListFriendsUser(1L);
         assertAll(
-                () -> assertEquals(friends.size(), 2),
-                () -> assertEquals(friends.get(0).getId(), 1),
-                () -> assertEquals(friends.get(1).getId(), 6)
+                () -> assertEquals(friends.size(), 1),
+                () -> assertEquals(friends.get(0).getId(), 2)
         );
     }
 }

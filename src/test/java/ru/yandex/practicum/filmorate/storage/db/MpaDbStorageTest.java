@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class MpaDbStorageTest {
+
     private final MpaDbStorage mpaDbStorage;
 
     @Test

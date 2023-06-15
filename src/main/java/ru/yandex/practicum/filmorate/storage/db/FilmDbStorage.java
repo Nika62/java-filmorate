@@ -44,6 +44,7 @@ public class FilmDbStorage implements FilmStorage {
                 return stmt;
             }, keyHolder);
             film.setId(keyHolder.getKey().longValue());
+            updateGenreFilms(film);
             log.info("Фильм {} добавлен в базу", film);
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при добавлении фильма {}.", e.getMessage());
@@ -57,15 +58,12 @@ public class FilmDbStorage implements FilmStorage {
         String sqlUpdate = "update films set id = ?, title = ?, description = ?, release_date = ?, duration = ?, mpa = ? WHERE id =?;";
         Map<String, Object> mpa = film.getMpa();
         Integer mpaId = (Integer) mpa.get("id");
-        if (Objects.nonNull(film.getGenres()) && film.getGenres().size() > 0) {
-            updateGenreFilms(film);
-            return film;
-        }
         try {
             boolean isUpdate = jdbcTemplate.update(sqlUpdate, film.getId(), film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), mpaId, film.getId()) > 0;
+            updateGenreFilms(film);
             if (isUpdate) {
                 log.info("Обновлен фильм {}.", film);
-                return film;
+                return getFilmById(film.getId());
             } else {
                 log.info("Произошла ошибка при обновлении фильма {}.", film);
                 throw new RequestDataBaseException("Произошла ошибка при обновлении фильма " + film);
@@ -91,12 +89,12 @@ public class FilmDbStorage implements FilmStorage {
                 "                      f.DURATION,\n" +
                 "                      f.mpa,\n" +
                 "                     r.TITLE,\n" +
-                "                     GROUP_CONCAT(DISTINCT g.ID) DESC,\n" +
-                "                     GROUP_CONCAT(DISTINCT g.TITLE)\n" +
+                "                     GROUP_CONCAT(DISTINCT g.ID),\n" +
+                "                     GROUP_CONCAT(DISTINCT g.TITLE ORDER BY G.ID)\n" +
                 "FROM films AS f\n" +
                 "JOIN RATING_MPA AS r ON f.MPA = r.id\n" +
-                "JOIN FILMS_GENRES as fg ON fg.FILM_ID=f.ID\n" +
-                "JOIN GENRES as g ON fg.GENRE_ID=g.ID\n" +
+                "LEFT JOIN FILMS_GENRES as fg ON fg.FILM_ID=f.ID\n" +
+                "LEFT JOIN GENRES as g ON fg.GENRE_ID=g.ID\n" +
                 "GROUP BY f.ID;";
         try {
             List<Film> films = jdbcTemplate.query(sql, this::mapRowToFilm);
@@ -109,29 +107,18 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(long id) {
-        String sql = "SELECT f.ID,\n" +
-                "                     f.TITLE,\n" +
-                "                      f.DESCRIPTION,\n" +
-                "                    f.RELEASE_DATE,\n" +
-                "                      f.DURATION,\n" +
-                "                      f.mpa,\n" +
-                "                     r.TITLE,\n" +
-                "FROM films AS f\n" +
-                "JOIN RATING_MPA AS r ON f.MPA = r.id " +
-                "WHERE F.ID= ?";
+        String sql = "SELECT f.ID, f.TITLE, f.DESCRIPTION, f.RELEASE_DATE,f.DURATION, f.mpa, r.TITLE, GROUP_CONCAT(DISTINCT g.ID ) , GROUP_CONCAT(DISTINCT g.TITLE ORDER BY G.ID) FROM films AS f\n" +
+                "JOIN RATING_MPA AS r ON f.MPA = r.id LEFT JOIN FILMS_GENRES as fg ON fg.FILM_ID=f.ID\n" +
+                "LEFT JOIN GENRES as g ON fg.GENRE_ID=g.ID  WHERE F.ID= ? GROUP BY R.TITLE;";
 
-        String sqlGenre = "Select DISTINCT * FROM GENRES AS g JOIN FILMS_GENRES as fg ON fg.genre_id = g.id WHERE fg.film_id = ? ORDER BY g.ID;";
         try {
             Film film = jdbcTemplate.queryForObject(sql, this::mapRowToFilm, id);
-            List<Genre> listGenres = jdbcTemplate.query(sqlGenre, this::mapRowGenres, id);
-            film.setGenres(listGenresToListHashMap(listGenres));
             return film;
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при поиске фильма c id = {}, {}", id, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при поиске фильма с id=" + id);
         }
     }
-    //private void getGenres()
 
     public boolean addLikeFilm(long filmId, long userId) {
         String sqlAddLike = "INSERT INTO USERS_LIKE_FILMS (user_id, film_id) VALUES(?, ?);";
@@ -162,10 +149,13 @@ public class FilmDbStorage implements FilmStorage {
 
     public List<Film> getPopularFilms(int count) {
         String sqlPopular = "SELECT F.*,\n" +
-                "       RM.TITLE\n" +
-                "FROM FILMS as F\n" +
-                "LEFT JOIN USERS_LIKE_FILMS AS U ON F.ID = U.FILM_ID\n" +
+                "       RM.TITLE,\n" +
+                "        GROUP_CONCAT(DISTINCT g.ID), \n" +
+                "        GROUP_CONCAT(DISTINCT g.TITLE ORDER BY G.ID)\n" +
+                "FROM FILMS as F LEFT JOIN USERS_LIKE_FILMS AS U ON F.ID = U.FILM_ID\n" +
                 "JOIN RATING_MPA RM on RM.ID = F.MPA\n" +
+                "LEFT JOIN FILMS_GENRES as fg ON fg.FILM_ID=f.ID\n" +
+                "LEFT JOIN GENRES as g ON fg.GENRE_ID=g.ID\n" +
                 "GROUP BY F.ID\n" +
                 "ORDER BY COUNT(USER_ID) DESC\n" +
                 "LIMIT ?;";
@@ -181,8 +171,15 @@ public class FilmDbStorage implements FilmStorage {
         HashMap<String, Object> mpaMap = new HashMap<>();
         mpaMap.put("id", resultSet.getInt(6));
         mpaMap.put("name", resultSet.getString(7));
+        List<HashMap<String, Object>> genres = new ArrayList<>();
+        String genresId = resultSet.getString(8);
+        String genresNames = resultSet.getString(9);
+
+        if (Objects.nonNull(genres) && Objects.nonNull(genresNames)) {
+            genres = toListGenres(stringToList(genresId), stringToList(genresNames));
+        }
         return new Film((resultSet.getLong(1)), (resultSet.getString(2)), (resultSet.getString(3)),
-                (resultSet.getDate(4).toLocalDate()), (resultSet.getInt(5)), mpaMap);
+                (resultSet.getDate(4).toLocalDate()), (resultSet.getInt(5)), mpaMap, genres);
     }
 
     private Genre mapRowGenres(ResultSet rs, int rowNum) throws SQLException {
@@ -191,25 +188,34 @@ public class FilmDbStorage implements FilmStorage {
 
     }
 
-    private List<HashMap<String, Object>> listGenresToListHashMap(List<Genre> list) {
+    private List<String> stringToList(String string) {
+        return List.of(string.split(","));
+    }
+
+    private List<HashMap<String, Object>> toListGenres(List<String> id, List<String> names) {
         List<HashMap<String, Object>> result = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < id.size(); i++) {
             HashMap<String, Object> map = new HashMap<>();
-            map.put("id", list.get(i).getId());
-            map.put("name", list.get(i).getName());
+            map.put("id", Integer.parseInt(id.get(i)));
+            map.put("name", names.get(i).toString());
             result.add(map);
         }
         return result;
     }
 
     private void updateGenreFilms(Film film) {
-        String sql = "INSERT INTO FILMS_GENRES (FILM_ID, GENRE_ID) VALUES(?, ?);";
+        String sqlDel = "DELETE FROM FILMS_GENRES WHERE FILM_ID=?;";
+
+        String sqlInsert = "INSERT INTO FILMS_GENRES (FILM_ID, GENRE_ID) VALUES(?, ?);";
+
+        jdbcTemplate.update(sqlDel, film.getId());
         List<Object> genresId = film.getGenres().stream()
                 .map(m -> m.get("id"))
+                .distinct()
                 .collect(Collectors.toList());
         try {
             for (int i = 0; i < genresId.size(); i++) {
-                boolean isUpdate = jdbcTemplate.update(sql, film.getId(), (Integer) genresId.get(i)) > 0;
+                boolean isUpdate = jdbcTemplate.update(sqlInsert, film.getId(), (Integer) genresId.get(i)) > 0;
                 if (!isUpdate) {
                     throw new RequestDataBaseException("Произошла ошибка при обновлении жанра фильма " + film);
                 }

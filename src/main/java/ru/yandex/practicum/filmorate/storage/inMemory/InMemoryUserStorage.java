@@ -23,6 +23,7 @@ public class InMemoryUserStorage implements UserStorage {
         user.setId(++userId);
         return userId;
     }
+
     @Override
     public User addUser(User user) {
         if (users.containsValue(user)) {
@@ -35,9 +36,8 @@ public class InMemoryUserStorage implements UserStorage {
         users.put(assignId(user), user);
         log.info("Добавлен новый пользователь " + user);
         return user;
-
-
     }
+
     @Override
     public User updateUser(User user) {
         if (users.containsKey(user.getId())) {
@@ -52,6 +52,7 @@ public class InMemoryUserStorage implements UserStorage {
             throw new UserNotFoundException("Пользователь " + user + " не зарегистрирован в базе.");
         }
     }
+
     @Override
     public boolean deleteUser(User user) {
         if (!users.containsValue(user)) {
@@ -61,6 +62,7 @@ public class InMemoryUserStorage implements UserStorage {
         users.remove(user.getId());
         return true;
     }
+
     @Override
     public List<User> getAllUsers() {
         if (users.isEmpty()) {

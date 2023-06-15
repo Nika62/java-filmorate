@@ -23,6 +23,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final HashMap<Long, Film> films = new HashMap<>();
     private final UserStorage userStorage;
     private int filmId = 0;
+
     private long assignId(Film film) {
         film.setId(++filmId);
         return filmId;
@@ -33,7 +34,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (films.containsValue(film)) {
             log.info("Произошла ошибка при добавлении фильма. {} уже существует.", film);
             throw new DataAlreadyExistsException("Фильм " + film + " уже существует.");
-
         }
         films.put(assignId(film), film);
         log.info("Добавлен новый фильм {}.", film);
@@ -78,6 +78,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         return films.get(id);
     }
+
     @Override
     public boolean addLikeFilm(long filmId, long userId) {
         checkFilm(filmId);

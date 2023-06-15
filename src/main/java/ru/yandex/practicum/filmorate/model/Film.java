@@ -17,6 +17,7 @@ import java.util.*;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Film implements Comparable<Film> {
+
     @EqualsAndHashCode.Exclude
     private long id;
     @EqualsAndHashCode.Exclude
@@ -78,6 +79,14 @@ public class Film implements Comparable<Film> {
         this.genres = genres;
     }
 
+    public Film(String name, String description, LocalDate date, int duration, HashMap<String, Object> mpa, List<HashMap<String, Object>> genres) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = date;
+        this.duration = duration;
+        this.mpa = mpa;
+        this.genres = genres;
+    }
 
     public Film(long id, String name, String description, LocalDate date, int duration) {
         this.id = id;
