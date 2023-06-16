@@ -33,7 +33,6 @@ public class UserDbStorage implements UserStorage {
 
         String sqlInsert = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?);";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-
         try {
             jdbcTemplate.update(connection -> {
                 PreparedStatement stmt = connection.prepareStatement(sqlInsert, new String[]{"id"});
