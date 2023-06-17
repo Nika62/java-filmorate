@@ -44,6 +44,7 @@ public class FilmDbStorage implements FilmStorage {
                 return stmt;
             }, keyHolder);
             film.setId(keyHolder.getKey().longValue());
+            updateGenreFilms(film);
             log.info("Фильм {} добавлен в базу", film);
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при добавлении фильма {}.", e.getMessage());
