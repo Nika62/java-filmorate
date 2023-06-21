@@ -33,7 +33,7 @@ public class MpaController {
 
     @GetMapping("/{id}")
     public Mpa getMpaById(@PathVariable int id) {
-        if (id<=0) {
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
         }
         return mpaService.getMpaById(id);

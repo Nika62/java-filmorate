@@ -54,12 +54,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean deleteUser(User user) {
-        if (!users.containsValue(user)) {
-            log.info("Произошла ошибка при удалении пользователя.{} отсутствует в базе.", user);
-            throw new UserNotFoundException("Пользователь " + user + " не зарегистрирован в базе.");
+    public boolean deleteUser(long id) {
+        if (!users.containsKey(id)) {
+            log.info("Произошла ошибка при удалении пользователя");
+            throw new UserNotFoundException("Пользователь c id=" + id + " не зарегистрирован в базе.");
         }
-        users.remove(user.getId());
+        users.remove(id);
         return true;
     }
 

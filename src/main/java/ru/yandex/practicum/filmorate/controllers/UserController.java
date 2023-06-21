@@ -35,14 +35,14 @@ public class UserController {
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
 
-        if (id<=0) {
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
         }
         return userService.getUserById(id);
     }
 
     @DeleteMapping
-    public boolean deleteUser(@RequestBody User user) {
-        return deleteUser(user);
+    public boolean deleteUser(@PathVariable Long id) {
+        return userService.delete(id);
     }
 }

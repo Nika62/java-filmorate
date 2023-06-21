@@ -32,7 +32,7 @@ public class GenreController {
 
     @GetMapping("/{id}")
     public Genre getGenreById(@PathVariable int id) {
-        if (id <=0) {
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
         }
         return genreService.getGenreById(id);
@@ -40,7 +40,7 @@ public class GenreController {
 
     @DeleteMapping
     public boolean deleteGenre(@PathVariable int id) {
-        if (id <=0) {
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
         }
         return genreService.deleteGenre(id);

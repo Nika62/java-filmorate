@@ -28,8 +28,8 @@ public class FilmController {
     }
 
     @DeleteMapping
-    public boolean deleteFilm(@RequestBody Film film) {
-        return filmService.deleteFilm(film);
+    public boolean deleteFilm(@PathVariable long id) {
+        return filmService.deleteFilm(id);
     }
 
     @GetMapping(produces = "application/json")
