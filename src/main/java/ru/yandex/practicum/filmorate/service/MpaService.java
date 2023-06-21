@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
@@ -20,8 +21,8 @@ public class MpaService {
         return mpaStorage.updateMpa(mpa);
     }
 
-    public boolean deleteMpa(Mpa mpa) {
-        return mpaStorage.deleteMpa(mpa);
+    public boolean deleteMpa(int id) {
+        return mpaStorage.deleteMpa(id);
     }
 
     public Mpa getMpaById(int id) {

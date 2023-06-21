@@ -87,7 +87,7 @@ class FilmDbStorageTest {
                 () -> {
                     filmDbStorage.updateFilm(testFilm);
                 });
-        assertEquals("Произошла ошибка при обновлении фильма " + testFilm, e.getMessage());
+        assertEquals("Произошла ошибка при поиске фильма с id=40", e.getMessage());
     }
 
     @Test

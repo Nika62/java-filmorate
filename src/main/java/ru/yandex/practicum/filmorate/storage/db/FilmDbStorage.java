@@ -59,15 +59,10 @@ public class FilmDbStorage implements FilmStorage {
         Map<String, Object> mpa = film.getMpa();
         Integer mpaId = (Integer) mpa.get("id");
         try {
-            boolean isUpdate = jdbcTemplate.update(sqlUpdate, film.getId(), film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), mpaId, film.getId()) > 0;
-            updateGenreFilms(film);
-            if (isUpdate) {
-                log.info("Обновлен фильм {}.", film);
-                return getFilmById(film.getId());
-            } else {
-                log.info("Произошла ошибка при обновлении фильма {}.", film);
-                throw new RequestDataBaseException("Произошла ошибка при обновлении фильма " + film);
-            }
+          jdbcTemplate.update(sqlUpdate, film.getId(), film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), mpaId, film.getId());
+          updateGenreFilms(film);
+          log.info("Обновлен фильм {}.", film);
+          return getFilmById(film.getId());
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при обновлении фильма {}", e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при обновлении фильма " + film);
@@ -97,8 +92,7 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN GENRES as g ON fg.GENRE_ID=g.ID\n" +
                 "GROUP BY f.ID;";
         try {
-            List<Film> films = jdbcTemplate.query(sql, this::mapRowToFilm);
-            return films;
+            return jdbcTemplate.query(sql, this::mapRowToFilm);
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при запросе всех фильмов: {}", e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при запросе всех фильмов");
@@ -112,8 +106,7 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN GENRES as g ON fg.GENRE_ID=g.ID  WHERE F.ID= ? GROUP BY R.TITLE;";
 
         try {
-            Film film = jdbcTemplate.queryForObject(sql, this::mapRowToFilm, id);
-            return film;
+            return jdbcTemplate.queryForObject(sql, this::mapRowToFilm, id);
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при поиске фильма c id = {}, {}", id, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при поиске фильма с id=" + id);
@@ -134,12 +127,12 @@ public class FilmDbStorage implements FilmStorage {
     public boolean deleteLikeFilm(long filmId, long userId) {
         String sqlAddLike = "DELETE FROM USERS_LIKE_FILMS WHERE user_id=? AND film_id=?;";
         try {
-            log.info("Пользователь с id={} удалил лайк  у фильма с id={}", userId, filmId);
             boolean isDel = jdbcTemplate.update(sqlAddLike, userId, filmId) > 0;
             if (!isDel) {
                 log.info("Произошла ошибка при удалении пользователем с id={} лайка фильму с id={}", userId, filmId);
                 throw new RequestDataBaseException("Произошла ошибка при удалении пользователем с id=" + userId + " лайка фильму с id=" + filmId);
             }
+            log.info("Пользователь с id={} удалил лайк  у фильма с id={}", userId, filmId);
             return isDel;
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при удалении пользователем с id={} лайка фильму с id={}, {}", userId, filmId, e.getMessage());
@@ -182,12 +175,6 @@ public class FilmDbStorage implements FilmStorage {
                 (resultSet.getDate(4).toLocalDate()), (resultSet.getInt(5)), mpaMap, genres);
     }
 
-    private Genre mapRowGenres(ResultSet rs, int rowNum) throws SQLException {
-        return new Genre(rs.getInt("id"), rs.getString("title"));
-
-
-    }
-
     private List<String> stringToList(String string) {
         return List.of(string.split(","));
     }
@@ -215,10 +202,7 @@ public class FilmDbStorage implements FilmStorage {
                 .collect(Collectors.toList());
         try {
             for (int i = 0; i < genresId.size(); i++) {
-                boolean isUpdate = jdbcTemplate.update(sqlInsert, film.getId(), (Integer) genresId.get(i)) > 0;
-                if (!isUpdate) {
-                    throw new RequestDataBaseException("Произошла ошибка при обновлении жанра фильма " + film);
-                }
+             jdbcTemplate.update(sqlInsert, film.getId(), (Integer) genresId.get(i));
             }
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при обновлении жанра фильма {}", e.getMessage());

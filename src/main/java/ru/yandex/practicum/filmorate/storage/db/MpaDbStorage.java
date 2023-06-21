@@ -46,14 +46,8 @@ public class MpaDbStorage implements MpaStorage {
     public Mpa updateMpa(Mpa mpa) {
         String sqlUpdate = "UPDATE RATING_MPA SET title=? WHERE id=?;";
         try {
-            boolean isUpdate = jdbcTemplate.update(sqlUpdate, mpa.getName(), mpa.getId()) > 0;
-            if (isUpdate) {
-                log.info("Обновлена категория рейтинга {}", mpa);
-                return mpa;
-            } else {
-                log.info("Произошла ошибка при обновлении катигории рейтинга {}.", mpa);
-                throw new RequestDataBaseException("Произошла ошибка при обновлении категории рейтинга " + mpa);
-            }
+            jdbcTemplate.update(sqlUpdate, mpa.getName(), mpa.getId());
+            return getMpaById(mpa.getId());
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при обновлении катигории рейтинга {}, {}", mpa, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при обновлении категории рейтинга " + mpa);
@@ -61,9 +55,9 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     @Override
-    public boolean deleteMpa(Mpa mpa) {
+    public boolean deleteMpa(int id) {
         String sqlDelete = "DELETE FROM RATING_MPA WHERE id=?;";
-        return jdbcTemplate.update(sqlDelete, mpa.getId()) > 0;
+        return jdbcTemplate.update(sqlDelete, id) > 0;
     }
 
     @Override

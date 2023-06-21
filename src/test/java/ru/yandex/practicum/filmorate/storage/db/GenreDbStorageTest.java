@@ -64,14 +64,14 @@ class GenreDbStorageTest {
                     genreDbStorage.updateGenre(genreForUpdate);
                 });
 
-        assertEquals("Произошла ошибка при обновлении жанра " + genreForUpdate, e.getMessage());
+        assertEquals("Произошла ошибка при поиске жанра с id=101", e.getMessage());
     }
 
     @Test
     @Order(5)
     void shouldDeleteGenre() {
         Genre genreForDel = new Genre(7);
-        boolean resultDelete = genreDbStorage.deleteGenre(genreForDel);
+        boolean resultDelete = genreDbStorage.deleteGenre(genreForDel.getId());
         assertTrue(resultDelete);
     }
 
@@ -79,7 +79,7 @@ class GenreDbStorageTest {
     @Order(6)
     void shouldDeleteGenreIdNotDb() {
         Genre genreForDel = new Genre(101);
-        boolean resultDelete = genreDbStorage.deleteGenre(genreForDel);
+        boolean resultDelete = genreDbStorage.deleteGenre(genreForDel.getId());
         assertFalse(resultDelete);
     }
 

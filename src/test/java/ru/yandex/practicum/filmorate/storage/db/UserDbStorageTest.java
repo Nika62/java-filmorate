@@ -70,7 +70,7 @@ class UserDbStorageTest {
                     userDbStorage.updateUser(userForUpdate);
                 });
 
-        assertEquals("Произошла ошибка при обновлении пользователя " + userForUpdate, e.getMessage());
+        assertEquals("Произошла ошибка при поиске пользователя с id=23", e.getMessage());
     }
 
     @Test

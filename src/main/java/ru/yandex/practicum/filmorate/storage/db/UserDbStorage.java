@@ -55,14 +55,8 @@ public class UserDbStorage implements UserStorage {
     public User updateUser(User user) {
         String sqlUpdate = "update users set id=?, email = ?, login= ?, name = ?, birthday = ? WHERE id =?;";
         try {
-            boolean isUpdate = jdbcTemplate.update(sqlUpdate, user.getId(), user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId()) > 0;
-            if (isUpdate) {
-                log.info("Пользователь обновлен {}.", user);
-                return user;
-            } else {
-                log.info("Произошла ошибка при обновлении пользователя {}", user);
-                throw new RequestDataBaseException("Произошла ошибка при обновлении пользователя " + user);
-            }
+            jdbcTemplate.update(sqlUpdate, user.getId(), user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
+            return getUserById(user.getId());
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при обновлении пользователя {} , {}", user, e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при обновлении пользователя " + user);

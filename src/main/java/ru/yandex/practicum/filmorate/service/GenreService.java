@@ -20,8 +20,9 @@ public class GenreService {
         return genreStorage.updateGenre(genre);
     }
 
-    public boolean deleteGenre(Genre genre) {
-        return genreStorage.deleteGenre(genre);
+    public boolean deleteGenre(int id) {
+
+        return genreStorage.deleteGenre(id);
     }
 
     public Genre getGenreById(int id) {
