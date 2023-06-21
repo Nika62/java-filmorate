@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.service.GenreService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("genres")
@@ -32,15 +31,18 @@ public class GenreController {
     }
 
     @GetMapping("/{id}")
-    public Genre getGenreById(@PathVariable Optional<Integer> id) {
-        if (!id.isPresent()) {
+    public Genre getGenreById(@PathVariable int id) {
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
         }
-        return genreService.getGenreById(id.get());
+        return genreService.getGenreById(id);
     }
 
     @DeleteMapping
-    public boolean deleteGenre(@RequestBody Genre genre) {
-        return genreService.deleteGenre(genre);
+    public boolean deleteGenre(@PathVariable int id) {
+        if (id <= 0) {
+            throw new IncorrectPathVariableException("id");
+        }
+        return genreService.deleteGenre(id);
     }
 }

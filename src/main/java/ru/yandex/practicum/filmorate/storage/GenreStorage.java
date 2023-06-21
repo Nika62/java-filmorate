@@ -9,7 +9,7 @@ public interface GenreStorage {
 
     Genre updateGenre(Genre genre);
 
-    Boolean deleteGenre(Genre genre);
+    Boolean deleteGenre(int id);
 
     Genre getGenreById(int id);
 

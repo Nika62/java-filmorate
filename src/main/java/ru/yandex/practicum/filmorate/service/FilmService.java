@@ -13,6 +13,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class FilmService {
+
     @Qualifier("filmDb")
     private final FilmStorage filmStorage;
 
@@ -24,8 +25,8 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public boolean deleteFilm(Film film) {
-        return filmStorage.deleteFilm(film);
+    public boolean deleteFilm(long id) {
+        return filmStorage.deleteFilm(id);
     }
 
     public List<Film> getAllFilms() {

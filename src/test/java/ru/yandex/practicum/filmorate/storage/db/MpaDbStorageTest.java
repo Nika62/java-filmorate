@@ -60,20 +60,20 @@ class MpaDbStorageTest {
                     mpaDbStorage.updateMpa(mpaForUpdate);
                 });
 
-        assertEquals("Произошла ошибка при обновлении категории рейтинга " + mpaForUpdate, e.getMessage());
+        assertEquals("Произошла ошибка при поиске категории рейтинга с id=88", e.getMessage());
     }
 
     @Test
     void shouldDeleteMpa() {
         Mpa mpaForDel = new Mpa(5);
-        boolean resultDelete = mpaDbStorage.deleteMpa(mpaForDel);
+        boolean resultDelete = mpaDbStorage.deleteMpa(mpaForDel.getId());
         assertTrue(resultDelete);
     }
 
     @Test
     void shouldDeleteMpaIdNotDb() {
         Mpa mpaForDel = new Mpa(88);
-        boolean resultDelete = mpaDbStorage.deleteMpa(mpaForDel);
+        boolean resultDelete = mpaDbStorage.deleteMpa(mpaForDel.getId());
         assertFalse(resultDelete);
     }
 

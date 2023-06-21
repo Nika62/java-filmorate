@@ -9,7 +9,7 @@ public interface MpaStorage {
 
     Mpa updateMpa(Mpa mpa);
 
-    boolean deleteMpa(Mpa mpa);
+    boolean deleteMpa(int id);
 
     Mpa getMpaById(int id);
 

@@ -46,14 +46,8 @@ public class GenreDbStorage implements GenreStorage {
     public Genre updateGenre(Genre genre) {
         String sqlUpdate = "UPDATE GENRES SET title=? WHERE id=?;";
         try {
-            boolean isUpdate = jdbcTemplate.update(sqlUpdate, genre.getName(), genre.getId()) > 0;
-            if (isUpdate) {
-                log.info("Обновлен жанр {}", genre);
-                return genre;
-            } else {
-                log.info("Произошла ошибка при обновлении жанра {}.", genre);
-                throw new RequestDataBaseException("Произошла ошибка при обновлении жанра " + genre);
-            }
+          jdbcTemplate.update(sqlUpdate, genre.getName(), genre.getId());
+          return getGenreById(genre.getId());
         } catch (DataAccessException e) {
             log.info("Произошла ошибка при обновлении жанра {}.", e.getMessage());
             throw new RequestDataBaseException("Произошла ошибка при обновлении жанра " + genre);
@@ -61,10 +55,10 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public Boolean deleteGenre(Genre genre) {
+    public Boolean deleteGenre(int id) {
 
         String sqlDelete = "DELETE FROM GENRES WHERE id=?;";
-        return jdbcTemplate.update(sqlDelete, genre.getId()) > 0;
+        return jdbcTemplate.update(sqlDelete, id) > 0;
     }
 
     @Override

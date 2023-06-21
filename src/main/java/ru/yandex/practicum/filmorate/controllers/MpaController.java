@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.service.MpaService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("mpa")
@@ -33,15 +32,15 @@ public class MpaController {
     }
 
     @GetMapping("/{id}")
-    public Mpa getMpaById(@PathVariable Optional<Integer> id) {
-        if (!id.isPresent()) {
+    public Mpa getMpaById(@PathVariable int id) {
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
         }
-        return mpaService.getMpaById(id.get());
+        return mpaService.getMpaById(id);
     }
 
     @DeleteMapping
-    public boolean deleteMpa(@RequestBody Mpa mpa) {
-        return mpaService.deleteMpa(mpa);
+    public boolean deleteMpa(@PathVariable int id) {
+        return mpaService.deleteMpa(id);
     }
 }

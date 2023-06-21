@@ -87,7 +87,7 @@ class FilmDbStorageTest {
                 () -> {
                     filmDbStorage.updateFilm(testFilm);
                 });
-        assertEquals("Произошла ошибка при обновлении фильма " + testFilm, e.getMessage());
+        assertEquals("Произошла ошибка при поиске фильма с id=40", e.getMessage());
     }
 
     @Test
@@ -96,15 +96,12 @@ class FilmDbStorageTest {
         mpa.put("id", 1);
         Film testFilm = new Film("Крадущийся тигр затаившийся дракон", "описание Крадущийся тигр затаившийся дракон", LocalDate.parse("2003-03-03"), 120, mpa);
         filmDbStorage.addFilm(testFilm);
-        assertTrue(filmDbStorage.deleteFilm(testFilm));
+        assertTrue(filmDbStorage.deleteFilm(1));
     }
 
     @Test
     void shouldDeleteFilmIdNotInDb() {
-        HashMap<String, Object> mpa = new HashMap<>();
-        mpa.put("id", 4);
-        boolean resultDelete = filmDbStorage.deleteFilm(new Film(12, "тигр затаившийся дракон",
-                "описание тигр затаившийся дракон", LocalDate.parse("2013-03-03"), 320, mpa));
+        boolean resultDelete = filmDbStorage.deleteFilm(99);
         assertFalse(resultDelete);
     }
 

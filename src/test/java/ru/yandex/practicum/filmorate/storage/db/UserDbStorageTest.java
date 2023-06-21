@@ -70,21 +70,21 @@ class UserDbStorageTest {
                     userDbStorage.updateUser(userForUpdate);
                 });
 
-        assertEquals("Произошла ошибка при обновлении пользователя " + userForUpdate, e.getMessage());
+        assertEquals("Произошла ошибка при поиске пользователя с id=23", e.getMessage());
     }
 
     @Test
     void shouldDeleteUser() {
         User userForAddDb = new User("user@mail.com", "log", "name", LocalDate.parse("2010-12-13"));
         userDbStorage.addUser(userForAddDb);
-        boolean resultDelete = userDbStorage.deleteUser(new User(1L, "mail@mail2.ru", "login", "name", LocalDate.parse("1990-02-01")));
+        boolean resultDelete = userDbStorage.deleteUser(1);
         assertTrue(resultDelete);
 
     }
 
     @Test
     void shouldDeleteUserIdNotInDb() {
-        boolean resultDelete = userDbStorage.deleteUser(new User(101, "mail@mail2.ru", "login", "name", LocalDate.parse("1990-02-01")));
+        boolean resultDelete = userDbStorage.deleteUser(99);
         assertFalse(resultDelete);
     }
 

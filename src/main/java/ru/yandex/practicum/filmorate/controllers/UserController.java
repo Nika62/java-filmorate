@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("users")
@@ -34,15 +33,16 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Optional<Long> id) {
-        if (!id.isPresent()) {
+    public User getUserById(@PathVariable Long id) {
+
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
         }
-        return userService.getUserById(id.get());
+        return userService.getUserById(id);
     }
 
     @DeleteMapping
-    public boolean deleteUser(@RequestBody User user) {
-        return deleteUser(user);
+    public boolean deleteUser(@PathVariable Long id) {
+        return userService.delete(id);
     }
 }

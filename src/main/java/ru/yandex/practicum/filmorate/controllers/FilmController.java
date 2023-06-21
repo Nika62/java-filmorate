@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("films")
@@ -29,8 +28,8 @@ public class FilmController {
     }
 
     @DeleteMapping
-    public boolean deleteFilm(@RequestBody Film film) {
-        return filmService.deleteFilm(film);
+    public boolean deleteFilm(@PathVariable long id) {
+        return filmService.deleteFilm(id);
     }
 
     @GetMapping(produces = "application/json")
@@ -39,23 +38,27 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable Optional<Long> id) {
-        if (!id.isPresent()) {
+    public Film getFilmById(@PathVariable long id) {
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
         }
-        return filmService.getFilmById(id.get());
+        return filmService.getFilmById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public boolean addLikeFilm(@PathVariable Optional<Long> id, @PathVariable Optional<Long> userId) {
-        checkById(id, userId);
-        return filmService.addLikeFilm(id.get(), userId.get());
+    public boolean addLikeFilm(@PathVariable long id, @PathVariable long userId) {
+        if (id <= 0 || userId <= 0) {
+            throw new IncorrectPathVariableException("id");
+        }
+        return filmService.addLikeFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public boolean deleteLikeFilm(@PathVariable Optional<Long> id, @PathVariable Optional<Long> userId) {
-        checkById(id, userId);
-        return filmService.deleteLikeFilm(id.get(), userId.get());
+    public boolean deleteLikeFilm(@PathVariable long id, @PathVariable long userId) {
+        if (id <= 0 || userId <= 0) {
+            throw new IncorrectPathVariableException("id");
+        }
+        return filmService.deleteLikeFilm(id, userId);
     }
 
     @GetMapping("/popular")
@@ -63,11 +66,4 @@ public class FilmController {
         return filmService.getPopularFilms(count);
     }
 
-    private void checkById(Optional<Long> id, Optional<Long> userId) {
-        if (!id.isPresent()) {
-            throw new IncorrectPathVariableException("id");
-        } else if (!userId.isPresent()) {
-            throw new IncorrectPathVariableException("userId");
-        }
-    }
 }
