@@ -53,7 +53,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean deleteFilm(long id ) {
+    public boolean deleteFilm(long id) {
         if (!films.containsKey(id)) {
             log.info("Произошла ошибка при удалении фильма.{} отсутствует в фильмотеке.");
             throw new FilmNotFoundException("Фильм c id=" + id + " отсутствует в фильмотеке.");
