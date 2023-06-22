@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,41 +20,40 @@ public class UserFriendsController {
     private final UserService userService;
 
     @PutMapping("/{friendId}")
-    public boolean addFriend(@PathVariable Optional<Long> id, @PathVariable Optional<Long> friendId) {
-        if (!id.isPresent()) {
+    public boolean addFriend(@PathVariable long id, @PathVariable long friendId) {
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
-        } else if (!friendId.isPresent()) {
+        } else if (friendId <= 0) {
             throw new IncorrectPathVariableException("friendId");
         }
-
-        return userService.addFriend(id.get(), friendId.get());
+        return userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{friendId}")
-    public boolean deleteFriend(@PathVariable Optional<Long> id, @PathVariable Optional<Long> friendId) {
-        if (!id.isPresent()) {
+    public boolean deleteFriend(@PathVariable long id, @PathVariable long friendId) {
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
-        } else if (!friendId.isPresent()) {
+        } else if (friendId <= 0) {
             throw new IncorrectPathVariableException("friendId");
         }
-        return userService.deleteFriend(id.get(), friendId.get());
+        return userService.deleteFriend(id, friendId);
     }
 
     @GetMapping
-    public List<User> getListFriendsUser(@PathVariable Optional<Long> id) {
-        if (!id.isPresent()) {
+    public List<User> getListFriendsUser(@PathVariable long id) {
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
         }
-        return userService.getListFriendsUser(id.get());
+        return userService.getListFriendsUser(id);
     }
 
     @GetMapping("/common/{otherId}")
-    public List<User> getListMutualFriends(@PathVariable Optional<Long> id, @PathVariable Optional<Long> otherId) {
-        if (!id.isPresent()) {
+    public List<User> getListMutualFriends(@PathVariable long id, @PathVariable long otherId) {
+        if (id <= 0) {
             throw new IncorrectPathVariableException("id");
-        } else if (!otherId.isPresent()) {
+        } else if (otherId <= 0) {
             throw new IncorrectPathVariableException("otherId");
         }
-        return userService.getListMutualFriends(id.get(), otherId.get());
+        return userService.getListMutualFriends(id, otherId);
     }
 }
